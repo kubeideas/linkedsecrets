@@ -27,7 +27,7 @@ func (r *LinkedSecretReconciler) AddFinalizer(linkedsecret *securityv1.LinkedSec
 			}
 			log.V(1).Info("Append Finalizer", "linkedsecret-finalizer", LINKEDSECRETFINALIZER)
 
-			log.V(1).Info("BEGIN RECONCILING - FINILIZER LINKEDSECRET")
+			log.V(1).Info("END RECONCILING - FINILIZER LINKEDSECRET")
 		}
 
 	}

@@ -34,27 +34,20 @@ install: manifests
 uninstall: manifests
 	kustomize build config/crd | kubectl delete -f -
 
-
-# Save manifests to yaml
-save-all: manifests
-	cd config/manager && kustomize edit set image controller=${IMG}
-	kustomize build config/default > install/install-linkedsecret.yaml
-
-# Save manifests to yaml (GCP secret credentials)
-save-all-gcp: manifests
+# Generate GCP manifests 
+gen-gcp: manifests
 	cd config/manager && kustomize edit set image controller=${IMG}
 	kustomize build config/gcp > install/gcp/install-linkedsecret-gcp.yaml	
 
-# Create secret with google crendentials
-google-credentials:
-	kubectl create secret generic gcp-credentials --from-file=./config/manager/gcp-credentials/gcp-credentials.json 
+# Generate AWS manifests 
+gen-aws: manifests
+	cd config/manager && kustomize edit set image controller=${IMG}
+	kustomize build config/aws > install/aws/install-linkedsecret-aws.yaml		
 
 # Deploy controller in the configured Kubernetes cluster in ~/.kube/config
 deploy: manifests
 	cd config/manager && kustomize edit set image controller=${IMG}
 	kustomize build config/default | kubectl apply -f -
-
-	
 
 # Generate manifests e.g. CRD, RBAC etc.
 manifests: controller-gen

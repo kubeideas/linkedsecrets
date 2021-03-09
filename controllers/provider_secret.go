@@ -59,7 +59,8 @@ func parseJSON(data []byte) (map[string][]byte, error) {
 
 	// parse json
 	if err := json.Unmarshal(data, &dat); err != nil {
-		return result, err
+
+		return result, &InvalidCloudSecret{}
 	}
 
 	for k, v := range dat {
@@ -73,31 +74,25 @@ func parseJSON(data []byte) (map[string][]byte, error) {
 	return result, nil
 }
 
-//check provider and return filled secret object
-func getProviderSecret(linkedsecret *securityv1.LinkedSecret) (corev1.Secret, error) {
+//GetProviderSecret access provider and return filled secret object
+func (r *LinkedSecretReconciler) GetProviderSecret(linkedsecret *securityv1.LinkedSecret) (corev1.Secret, error) {
 
 	var err error
 	data := []byte{}
 	secret := corev1.Secret{}
 	secretMap := make(map[string][]byte)
 
-	if linkedsecret.Spec.Provider == GOOGLE {
+	//retrieve Cloud secret data
+	switch linkedsecret.Spec.Provider {
+	case GOOGLE:
+		data, err = r.GetGCPSecret(linkedsecret)
+	case AWS:
+		data, err = r.GetAWSSecret(linkedsecret)
+	}
 
-		// ######## begin fake data ########
-		// if linkedsecret.Name == "google-secret-one" {
-		// 	data = []byte("password=senha1")
-		// } else {
-		// 	data = []byte("password=senha2")
-		// }
-		// err = nil
-		// ######## end fake data ########
-
-		//Restore code after all linkedsecret crud is finished.
-		data, err = GetGCPSecret(linkedsecret)
-
-		if err != nil {
-			return corev1.Secret{}, err
-		}
+	//return error retrieving Cloud secret data
+	if err != nil {
+		return corev1.Secret{}, err
 	}
 
 	// create key/value map based on choosen format

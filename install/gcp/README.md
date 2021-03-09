@@ -5,7 +5,7 @@ Before installing Linkedsecrets operator it is necessary create a `Google Servic
 * role `Secret Manager Secret Accessor` permission.
 * Create Json key file and save with name `gcp-credentials.json` in this directory
 
-**[IMPORTANT]** Have in mind to grant access only to secrets strictly relevants to your Kubernetes cluster.
+**[IMPORTANT]** Have in mind to grant access only to secrets strictly relevants to your Kubernetes cluster project.
 
 ## Namespace and GCP credentials secret
 ```bash

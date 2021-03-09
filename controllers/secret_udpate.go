@@ -14,7 +14,7 @@ func (r *LinkedSecretReconciler) UpdateSecret(ctx context.Context, linkedsecret 
 
 	log := r.Log.WithValues("linkedsecret", fmt.Sprintf("%s/%s", linkedsecret.Namespace, linkedsecret.Name))
 
-	secret, err := getProviderSecret(linkedsecret)
+	secret, err := r.GetProviderSecret(linkedsecret)
 
 	if err != nil {
 		r.Recorder.Event(linkedsecret, "Warning", "FailSynching", err.Error())
@@ -41,7 +41,7 @@ func (r *LinkedSecretReconciler) UpdateSecret(ctx context.Context, linkedsecret 
 		return err
 	}
 
-	log.V(1).Info("Synchronized data", "secret", fmt.Sprintf("%s/%s", secret.Namespace, secret.Name))
+	log.V(1).Info("Synchronized secret data on schedule", "secret", fmt.Sprintf("%s/%s", secret.Namespace, secret.Name))
 
 	return nil
 }

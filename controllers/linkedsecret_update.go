@@ -22,7 +22,7 @@ func (r *LinkedSecretReconciler) UpdateLinkedSecret(ctx context.Context, linkeds
 	}
 
 	// update secret with provider data
-	secret, err := getProviderSecret(linkedsecret)
+	secret, err := r.GetProviderSecret(linkedsecret)
 
 	if err != nil {
 		r.Recorder.Event(linkedsecret, "Warning", "FailSynching", err.Error())
@@ -32,7 +32,7 @@ func (r *LinkedSecretReconciler) UpdateLinkedSecret(ctx context.Context, linkeds
 		}
 		return err
 	}
-	log.V(1).Info("Synchronize data", "secret", fmt.Sprintf("Secret %s/%s", secret.Namespace, secret.Name))
+	log.V(1).Info("Synchronize secret data on update", "secret", fmt.Sprintf("Secret %s/%s", secret.Namespace, secret.Name))
 
 	// always set the controller reference so that we know which object owns this.
 	if err := ctrl.SetControllerReference(linkedsecret, &secret, r.Scheme); err != nil {
