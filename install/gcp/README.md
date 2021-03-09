@@ -12,7 +12,7 @@ Before installing Linkedsecrets operator it is necessary create a `Google Servic
 ./create_secret.sh
 ```
 
-## CDR's and controller
+## CRD's and controller
 ```bash
 kubectl apply -f install-linkedsecret-gcp.yaml
 ```
