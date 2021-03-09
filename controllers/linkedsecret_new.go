@@ -61,7 +61,7 @@ func (r *LinkedSecretReconciler) NewLinkedSecret(ctx context.Context, linkedsecr
 		return err
 	}
 
-	log.V(1).Info("Synchronize data", "secret", fmt.Sprintf("%s/%s", secret.Namespace, secret.Name))
+	log.V(1).Info("Synchronize secret data on creation", "secret", fmt.Sprintf("%s/%s", secret.Namespace, secret.Name))
 
 	// update linkedsecret status
 	linkedsecret.Status.CurrentSecretStatus = STATUSSYNCHED

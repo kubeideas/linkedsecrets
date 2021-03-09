@@ -41,7 +41,7 @@ func (r *LinkedSecretReconciler) UpdateSecret(ctx context.Context, linkedsecret 
 		return err
 	}
 
-	log.V(1).Info("Synchronized secret data", "secret", fmt.Sprintf("%s/%s", secret.Namespace, secret.Name))
+	log.V(1).Info("Synchronized secret data on schedule", "secret", fmt.Sprintf("%s/%s", secret.Namespace, secret.Name))
 
 	return nil
 }
