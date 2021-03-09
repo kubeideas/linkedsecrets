@@ -33,7 +33,7 @@ func (r *LinkedSecretReconciler) NewLinkedSecret(ctx context.Context, linkedsecr
 	linkedsecret.Status.CurrentProviderOptions = linkedsecret.Spec.ProviderOptions
 
 	// create secret with providerdata
-	secret, err := getProviderSecret(linkedsecret)
+	secret, err := r.GetProviderSecret(linkedsecret)
 
 	if err != nil {
 		r.Recorder.Event(linkedsecret, "Warning", "FailSynching", err.Error())

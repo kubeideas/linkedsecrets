@@ -22,7 +22,7 @@ func (r *LinkedSecretReconciler) UpdateLinkedSecret(ctx context.Context, linkeds
 	}
 
 	// update secret with provider data
-	secret, err := getProviderSecret(linkedsecret)
+	secret, err := r.GetProviderSecret(linkedsecret)
 
 	if err != nil {
 		r.Recorder.Event(linkedsecret, "Warning", "FailSynching", err.Error())
