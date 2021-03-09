@@ -17,5 +17,5 @@ type InvalidCloudSecret struct {
 }
 
 func (i *InvalidCloudSecret) Error() string {
-	return "Invalid Cloud Secret data."
+	return "Invalid Cloud Secret data format."
 }
