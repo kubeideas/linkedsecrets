@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	cloud.google.com/go v0.76.0
+	github.com/aws/aws-sdk-go v1.37.25
 	github.com/go-logr/logr v0.1.0
 	github.com/onsi/ginkgo v1.11.0
 	github.com/onsi/gomega v1.8.1
