@@ -22,8 +22,8 @@ import (
 // LinkedSecretSpec defines the desired state of LinkedSecret
 type LinkedSecretSpec struct {
 
-	// +kubebuilder:validation:Enum={"Google"}
-	// Supported cloud secret manager. Valid options: Google.
+	// +kubebuilder:validation:Enum={"Google","AWS"}
+	// Supported cloud secret manager. Valid options: Google,AWS.
 	Provider string `json:"provider,required"`
 
 	// +kubebuilder:validation:Enum={"PLAIN", "JSON"}
@@ -41,7 +41,7 @@ type LinkedSecretSpec struct {
 
 	// +kubebuilder:validation:Type=string
 	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:Pattern=^[a-z]+[a-z-]+[a-z]$
+	// +kubebuilder:validation:Pattern=[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*
 	// Secret name expected to be created into kubernetes with data fetched from Cloud secret manager solution.
 	SecretName string `json:"secretName"`
 

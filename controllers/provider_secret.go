@@ -86,6 +86,8 @@ func (r *LinkedSecretReconciler) GetProviderSecret(linkedsecret *securityv1.Link
 	switch linkedsecret.Spec.Provider {
 	case GOOGLE:
 		data, err = r.GetGCPSecret(linkedsecret)
+	case AWS:
+		data, err = r.GetAWSSecret(linkedsecret)
 	}
 
 	//return error retrieving Cloud secret data
