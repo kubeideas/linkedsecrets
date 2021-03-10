@@ -23,11 +23,6 @@ func (r *LinkedSecretReconciler) NewLinkedSecret(ctx context.Context, linkedsecr
 		}
 	}
 
-	// set default secret name if it was not informed
-	// if linkedsecret.Spec.SecretName != "" {
-	// 	linkedsecret.Spec.SecretName = linkedsecret.Name
-	// }
-
 	// update provider status
 	linkedsecret.Status.CurrentProvider = linkedsecret.Spec.Provider
 	linkedsecret.Status.CurrentProviderOptions = linkedsecret.Spec.ProviderOptions

@@ -27,6 +27,7 @@ func (r *LinkedSecretReconciler) CronJobParser(ctx context.Context, linkedsecret
 		linkedsecret.Status.CronJobID = -1
 		linkedsecret.Status.CurrentSchedule = linkedsecret.Spec.Schedule
 		if err := r.Status().Update(ctx, linkedsecret); err != nil {
+			log.V(1).Info("Parse schedule", "schedule", err)
 			return err
 		}
 		//debug info
