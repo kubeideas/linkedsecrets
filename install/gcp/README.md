@@ -12,7 +12,7 @@ Before installing Linkedsecrets operator it is necessary create a `Google Servic
 ./create_secret.sh
 ```
 
-## CDR's and controller
+## CRD's and controller
 ```bash
 kubectl apply -f install-linkedsecret-gcp.yaml
 ```
@@ -58,11 +58,28 @@ Example:
 ```
 
 ## Schedule
-Linkedsecret supports synchronization based on schedule.
+Linkedsecret supports synchronization based on schedule. 
+Pre-defined cron expressions and Classic cron expressions are accepted.
 
-Accepted formats:
-* Pre-defined cron expressions. Ex: "@every 10minutes"
-* 6 field format cron expressions. Ex: "*/20 * * * * *"
+### Pre-defined Cron Expressions examples:
+| Expression       | Description                          |
+|------------------|--------------------------------------|
+| "@every 300s"    | Run every 5 minutes                  |
+| "@every 10m"     | Run every 10 minutes                 | 
+| "@every 5m30s"   | Run every 5 minutes and 30 seconds   |
+| "@hourly"        | Run once an hour, beginning of hour  |
+| "@daily"         | Run once a day, midnight             |
+|                  |                                      |
+
+### Cron Expressions examples:
+
+| Expression       | Description                          |
+|------------------|--------------------------------------|
+| "*/20 * * * * *" | Run every 20 seconds                 |
+| "0 */5 * * * *"  | Run every 5 minutes                  |
+| "0 0 * * * *"    | Run once an hour, beginning of hour  | 
+| "0 0 0 * * *"    | Run once a day, midnight             |
+|                  |                                      |
 
 **[IMPORTANT]** Have in mind that Google cloud will charge you based on secret access. Having said that, tune the schedule accordingly.
 
