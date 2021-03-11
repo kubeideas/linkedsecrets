@@ -43,7 +43,7 @@ var _ = Describe("Linkedsecret controller", func() {
 	)
 
 	var gcpPlain linkedSecretTest
-	var gcpJson linkedSecretTest
+	var gcpJSON linkedSecretTest
 
 	BeforeEach(func() {
 		gcpPlain = linkedSecretTest{
@@ -59,7 +59,7 @@ var _ = Describe("Linkedsecret controller", func() {
 			},
 		}
 
-		gcpJson = linkedSecretTest{
+		gcpJSON = linkedSecretTest{
 			name:      "google-example2",
 			namespace: "default",
 			spec: securityv1.LinkedSecretSpec{
@@ -143,13 +143,13 @@ var _ = Describe("Linkedsecret controller", func() {
 				ctx := context.Background()
 				linkedSecret := &securityv1.LinkedSecret{
 					TypeMeta:   v1.TypeMeta{Kind: "LinkedSecret", APIVersion: "linkedsecrets/api/v1"},
-					ObjectMeta: v1.ObjectMeta{Name: gcpJson.name, Namespace: gcpJson.namespace},
-					Spec:       gcpJson.spec,
+					ObjectMeta: v1.ObjectMeta{Name: gcpJSON.name, Namespace: gcpJSON.namespace},
+					Spec:       gcpJSON.spec,
 				}
 				// Create new LinkeSecret
 				Expect(k8sClient.Create(ctx, linkedSecret)).Should(Succeed())
 
-				linkedSecretLookupKey := types.NamespacedName{Namespace: gcpJson.namespace, Name: gcpJson.name}
+				linkedSecretLookupKey := types.NamespacedName{Namespace: gcpJSON.namespace, Name: gcpJSON.name}
 				createdLinkedSecret := &securityv1.LinkedSecret{}
 
 				// Get linkedSecret
