@@ -2,7 +2,6 @@ package controllers
 
 // Status constants
 const (
-	JOBACTIVE            = "Active"
 	JOBSCHEDULED         = "Scheduled"
 	JOBSUSPENDED         = "Suspended"
 	JOBNOTSCHEDULED      = "NotScheduled"
