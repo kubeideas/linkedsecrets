@@ -8,6 +8,8 @@ const (
 	JOBFAILPARSESCHEDULE = "FailParseSchedule"
 	STATUSSYNCHED        = "Synched"
 	STATUSNOTSYNCHED     = "NotSynched"
+	KEEPSECRETON         = "ON"
+	KEEPSECRETOFF        = "OFF"
 )
 
 // Providers constants

@@ -39,9 +39,12 @@ func (r *LinkedSecretReconciler) NewLinkedSecret(ctx context.Context, linkedsecr
 		return err
 	}
 
-	// always set the controller reference so that we know which object owns this.
-	if err := ctrl.SetControllerReference(linkedsecret, &secret, r.Scheme); err != nil {
-		return err
+	// Set the controller reference so that we know which object owns this.
+	// Secret will be deleted when Linkedsecret is deleted.
+	if linkedsecret.Spec.KeepSecretOnDelete == KEEPSECRETOFF {
+		if err := ctrl.SetControllerReference(linkedsecret, &secret, r.Scheme); err != nil {
+			return err
+		}
 	}
 
 	createOptions := &client.CreateOptions{FieldManager: "linkedsecret.Name"}
@@ -63,6 +66,7 @@ func (r *LinkedSecretReconciler) NewLinkedSecret(ctx context.Context, linkedsecr
 	linkedsecret.Status.CreatedSecret = secret.Name
 	linkedsecret.Status.CreatedSecretNamespace = secret.Namespace
 	linkedsecret.Status.LastScheduleExecution = &metav1.Time{Time: time.Now()}
+	linkedsecret.Status.KeepSecretOnDelete = linkedsecret.Spec.KeepSecretOnDelete
 
 	if err := r.Status().Update(ctx, linkedsecret); err != nil {
 		return err

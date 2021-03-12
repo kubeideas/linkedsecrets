@@ -25,9 +25,12 @@ func (r *LinkedSecretReconciler) UpdateSecret(ctx context.Context, linkedsecret 
 		return err
 	}
 
-	// always set the controller reference so that we know which object owns this.
-	if err := ctrl.SetControllerReference(linkedsecret, &secret, r.Scheme); err != nil {
-		return err
+	// Set the controller reference so that we know which object owns this.
+	// Secret will be deleted when Linkedsecret is deleted.
+	if linkedsecret.Spec.KeepSecretOnDelete == KEEPSECRETOFF {
+		if err := ctrl.SetControllerReference(linkedsecret, &secret, r.Scheme); err != nil {
+			return err
+		}
 	}
 
 	// update existent secret
