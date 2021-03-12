@@ -7,8 +7,8 @@ Supported Cloud secret solutions:
 * Google Secret Manager
 * AWS Secret Manager
 
-
 ## Installation
+
 Go to [Releases](https://github.com/kubeideas/linkedsecrets/releases) and download install package with instructions and examples.
 
 
