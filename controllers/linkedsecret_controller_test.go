@@ -38,8 +38,8 @@ type linkedSecretTest struct {
 var _ = Describe("Linkedsecret controller", func() {
 
 	const (
-		timeout  = time.Second * 60
-		interval = time.Millisecond * 100
+		TIMEOUT  = time.Second * 60
+		INTERVAL = time.Millisecond * 100
 	)
 
 	var gcpPlain linkedSecretTest
@@ -96,9 +96,9 @@ var _ = Describe("Linkedsecret controller", func() {
 						return false
 					}
 					return true
-				}, timeout, interval).Should(BeTrue())
+				}, TIMEOUT, INTERVAL).Should(BeTrue())
 
-				// Expected spec
+				// Check expected spec
 				Expect(createdLinkedSecret.Spec.Provider).Should(Equal("Google"))
 				Expect(createdLinkedSecret.Spec.ProviderDataFormat).Should(Equal("PLAIN"))
 				Expect(createdLinkedSecret.Spec.ProviderOptions["project"]).Should(Equal("project01-306719"))
@@ -120,9 +120,9 @@ var _ = Describe("Linkedsecret controller", func() {
 						return false
 					}
 					return true
-				}, timeout, interval).Should(BeTrue())
+				}, TIMEOUT, INTERVAL).Should(BeTrue())
 
-				// Check Current status
+				// Check expected status
 				Expect(createdLinkedSecret.Status.CreatedSecret).Should(Equal("mysecret-google-example1"))
 				Expect(createdLinkedSecret.Status.CronJobID).Should(Equal(cron.EntryID(1)))
 				Expect(createdLinkedSecret.Status.CronJobStatus).Should(Equal("Scheduled"))
@@ -136,7 +136,7 @@ var _ = Describe("Linkedsecret controller", func() {
 		})
 	})
 
-	Describe("Creating GCP Json Linkedsecret", func() {
+	Describe("Creating GCP JSON Linkedsecret", func() {
 		Context("Creating new Linkedsecret sinchronizing data with GCP", func() {
 			It("Should be GCP Linkedsecret", func() {
 				By("Creating new GCP linkedsecret")
@@ -159,9 +159,9 @@ var _ = Describe("Linkedsecret controller", func() {
 						return false
 					}
 					return true
-				}, timeout, interval).Should(BeTrue())
+				}, TIMEOUT, INTERVAL).Should(BeTrue())
 
-				// Expected spec
+				// Check expected spec
 				Expect(createdLinkedSecret.Spec.Provider).Should(Equal("Google"))
 				Expect(createdLinkedSecret.Spec.ProviderDataFormat).Should(Equal("JSON"))
 				Expect(createdLinkedSecret.Spec.ProviderOptions["project"]).Should(Equal("project01-306719"))
@@ -171,7 +171,7 @@ var _ = Describe("Linkedsecret controller", func() {
 				Expect(createdLinkedSecret.Spec.Suspended).Should(Equal(false))
 				Expect(createdLinkedSecret.Spec.Schedule).Should(Equal("@every 1s"))
 
-				// Expected status
+				// Check expected status
 				By("By checking linkedsecret status")
 				// Get linkedSecret
 				Eventually(func() bool {
@@ -183,7 +183,7 @@ var _ = Describe("Linkedsecret controller", func() {
 						return false
 					}
 					return true
-				}, timeout, interval).Should(BeTrue())
+				}, TIMEOUT, INTERVAL).Should(BeTrue())
 
 				// Check Current status
 				Expect(createdLinkedSecret.Status.CreatedSecret).Should(Equal("mysecret-google-example2"))
