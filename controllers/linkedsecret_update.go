@@ -15,7 +15,9 @@ func (r *LinkedSecretReconciler) UpdateLinkedSecret(ctx context.Context, linkeds
 	log := r.Log.WithValues("linkedsecret", fmt.Sprintf("%s/%s", linkedsecret.Namespace, linkedsecret.Name))
 
 	// Change schedule for a valid old job
-	if linkedsecret.Status.CurrentSchedule != linkedsecret.Spec.Schedule || linkedsecret.Spec.Suspended {
+	if linkedsecret.Status.CurrentSchedule != linkedsecret.Spec.Schedule ||
+		linkedsecret.Spec.Suspended ||
+		linkedsecret.Status.KeepSecretOnDelete != linkedsecret.Spec.KeepSecretOnDelete {
 		if err := r.RemoveCronJob(ctx, linkedsecret); err != nil {
 			return err
 		}
@@ -34,9 +36,12 @@ func (r *LinkedSecretReconciler) UpdateLinkedSecret(ctx context.Context, linkeds
 	}
 	log.V(1).Info("Synchronize secret data on update", "secret", fmt.Sprintf("Secret %s/%s", secret.Namespace, secret.Name))
 
-	// always set the controller reference so that we know which object owns this.
-	if err := ctrl.SetControllerReference(linkedsecret, &secret, r.Scheme); err != nil {
-		return err
+	// Set the controller reference so that we know which object owns this.
+	// Secret will be deleted when Linkedsecret is deleted.
+	if linkedsecret.Spec.KeepSecretOnDelete == KEEPSECRETOFF {
+		if err := ctrl.SetControllerReference(linkedsecret, &secret, r.Scheme); err != nil {
+			return err
+		}
 	}
 
 	// update existent secret
@@ -61,12 +66,21 @@ func (r *LinkedSecretReconciler) UpdateLinkedSecret(ctx context.Context, linkeds
 		r.Recorder.Event(linkedsecret, "Warning", "Cronjob suspended", linkedsecret.Name)
 	}
 
+	// create secret cronjob with new schedule
+	if linkedsecret.Spec.Schedule != "" &&
+		!linkedsecret.Spec.Suspended && len(r.Cronjob) == 0 {
+		r.AddCronjob(ctx, linkedsecret)
+	}
+
 	// update linkedsecret status
 	linkedsecret.Status.CurrentSecretStatus = STATUSSYNCHED
 	linkedsecret.Status.CreatedSecret = secret.Name
 	linkedsecret.Status.CreatedSecretNamespace = secret.Namespace
 	linkedsecret.Status.CurrentProvider = linkedsecret.Spec.Provider
 	linkedsecret.Status.CurrentProviderOptions = linkedsecret.Spec.ProviderOptions
+	linkedsecret.Status.CurrentSchedule = linkedsecret.Spec.Schedule
+	linkedsecret.Status.KeepSecretOnDelete = linkedsecret.Spec.KeepSecretOnDelete
+
 	if err := r.Status().Update(ctx, linkedsecret); err != nil {
 		return err
 	}
@@ -77,13 +91,9 @@ func (r *LinkedSecretReconciler) UpdateLinkedSecret(ctx context.Context, linkeds
 	log.V(1).Info("Update linkedsecret", "CreatedSecretNamespace", linkedsecret.Status.CreatedSecretNamespace)
 	log.V(1).Info("Update linkedsecret", "CurrentProvider", linkedsecret.Status.CurrentProvider)
 	log.V(1).Info("Update linkedsecret", "CurrentProviderOptions", linkedsecret.Status.CurrentProviderOptions)
-
-	// create secret cronjob with new schedule
-	if (linkedsecret.Spec.Schedule != "" && linkedsecret.Spec.Schedule != linkedsecret.Status.CurrentSchedule) ||
-		(!linkedsecret.Spec.Suspended && linkedsecret.Status.CronJobStatus == JOBSUSPENDED) {
-		// errors will be reported on events and schedule wont be created
-		r.AddCronjob(ctx, linkedsecret)
-	}
+	log.V(1).Info("Update linkedsecret", "KeepSecretOnDelete", linkedsecret.Status.KeepSecretOnDelete)
+	log.V(1).Info("Update linkedsecret", "CurrentSchedule", linkedsecret.Status.CurrentSchedule)
+	log.V(1).Info("Update linkedsecret", "Cronjob map", len(r.Cronjob))
 
 	// Record linkedsecret updated
 	r.Recorder.Event(linkedsecret, "Normal", "Updated", linkedsecret.Name)

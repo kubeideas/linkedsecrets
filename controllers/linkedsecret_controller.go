@@ -93,6 +93,7 @@ func (r *LinkedSecretReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 		linkedsecret.Status.CurrentProvider != linkedsecret.Spec.Provider ||
 		!reflect.DeepEqual(linkedsecret.Status.CurrentProviderOptions, linkedsecret.Spec.ProviderOptions) ||
 		linkedsecret.Status.CurrentSchedule != linkedsecret.Spec.Schedule ||
+		linkedsecret.Status.KeepSecretOnDelete != linkedsecret.Spec.KeepSecretOnDelete ||
 		(linkedsecret.Spec.Suspended && linkedsecret.Status.CronJobStatus != JOBSUSPENDED) ||
 		(!linkedsecret.Spec.Suspended && linkedsecret.Status.CronJobStatus == JOBSUSPENDED) {
 

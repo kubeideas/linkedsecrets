@@ -2,13 +2,14 @@ package controllers
 
 // Status constants
 const (
-	JOBACTIVE            = "Active"
 	JOBSCHEDULED         = "Scheduled"
 	JOBSUSPENDED         = "Suspended"
 	JOBNOTSCHEDULED      = "NotScheduled"
 	JOBFAILPARSESCHEDULE = "FailParseSchedule"
 	STATUSSYNCHED        = "Synched"
 	STATUSNOTSYNCHED     = "NotSynched"
+	KEEPSECRETON         = "ON"
+	KEEPSECRETOFF        = "OFF"
 )
 
 // Providers constants

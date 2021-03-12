@@ -25,8 +25,8 @@ func (r *LinkedSecretReconciler) CronJobParser(ctx context.Context, linkedsecret
 		// update cronjob status
 		linkedsecret.Status.CronJobStatus = JOBFAILPARSESCHEDULE
 		linkedsecret.Status.CronJobID = -1
-		linkedsecret.Status.CurrentSchedule = linkedsecret.Spec.Schedule
 		if err := r.Status().Update(ctx, linkedsecret); err != nil {
+			log.V(1).Info("Parse schedule", "schedule", err)
 			return err
 		}
 		//debug info
@@ -84,7 +84,6 @@ func (r *LinkedSecretReconciler) AddCronjob(ctx context.Context, linkedsecret *s
 	r.Cronjob[linkedsecret.UID].Start()
 
 	ID, err := r.Cronjob[linkedsecret.UID].AddFunc(linkedsecret.Spec.Schedule, func() {
-		//fmt.Printf("\ntick [ %s ]\n", linkedsecret.Spec.Schedule)
 		r.CronUpdateJob(ctx, linkedsecret)
 	})
 
@@ -92,16 +91,15 @@ func (r *LinkedSecretReconciler) AddCronjob(ctx context.Context, linkedsecret *s
 		return err
 	}
 
-	//set status for cronjob
+	//set status
 	linkedsecret.Status.CronJobID = ID
 	linkedsecret.Status.CronJobStatus = JOBSCHEDULED
-	linkedsecret.Status.CurrentSchedule = linkedsecret.Spec.Schedule
+
 	if err := r.Status().Update(ctx, linkedsecret); err != nil {
 		return err
 	}
 
 	//debug info
-	log.V(1).Info("Add cronjob", "schedule", linkedsecret.Status.CurrentSchedule)
 	log.V(1).Info("Add cronjob", "jobId", linkedsecret.Status.CronJobID)
 	log.V(1).Info("Add cronjob", "jobStatus", linkedsecret.Status.CronJobStatus)
 
@@ -118,6 +116,7 @@ func (r *LinkedSecretReconciler) RemoveCronJob(ctx context.Context, linkedsecret
 	// remove cron only if it exists on map
 	if _, ok := r.Cronjob[linkedsecret.UID]; ok {
 		r.Cronjob[linkedsecret.UID].Remove(linkedsecret.Status.CronJobID)
+		delete(r.Cronjob, linkedsecret.UID)
 	} else {
 		// debug info
 		log.V(1).Info("Remove cronjob", "schedule", "no schedule to be removed")
@@ -135,7 +134,7 @@ func (r *LinkedSecretReconciler) RemoveCronJob(ctx context.Context, linkedsecret
 	log.V(1).Info("Remove cronjob", "schedule", linkedsecret.Status.CurrentSchedule)
 	log.V(1).Info("Remove cronjob", "jobId", linkedsecret.Status.CronJobID)
 	log.V(1).Info("Remove cronjob", "jobStatus", linkedsecret.Status.CronJobStatus)
-	log.V(1).Info("Remove cronjob", "cronEntries", len(r.Cronjob[linkedsecret.UID].Entries()))
+	log.V(1).Info("Remove cronjob", "Cronjob map", len(r.Cronjob))
 
 	//record deletion event
 	r.Recorder.Event(linkedsecret, "Normal", "RemovedSchedule", fmt.Sprintf(" %s/%s", linkedsecret.Status.CreatedSecretNamespace, linkedsecret.Status.CreatedSecret))
