@@ -16,7 +16,7 @@ func (r *LinkedSecretReconciler) NewLinkedSecret(ctx context.Context, linkedsecr
 
 	log := r.Log.WithValues("linkedsecret", fmt.Sprintf("%s/%s", linkedsecret.Namespace, linkedsecret.Name))
 
-	// remove schedule if secret name was changed
+	// remove schedule job if secret name was changed
 	if linkedsecret.Status.CronJobID > 0 {
 		if err := r.RemoveCronJob(ctx, linkedsecret); err != nil {
 			return err
@@ -47,7 +47,7 @@ func (r *LinkedSecretReconciler) NewLinkedSecret(ctx context.Context, linkedsecr
 		}
 	}
 
-	createOptions := &client.CreateOptions{FieldManager: "linkedsecret.Name"}
+	createOptions := &client.CreateOptions{FieldManager: linkedsecret.Name}
 
 	if err = r.Create(ctx, &secret, createOptions); err != nil {
 		r.Recorder.Event(linkedsecret, "Warning", "FailCreating", err.Error())
@@ -67,6 +67,7 @@ func (r *LinkedSecretReconciler) NewLinkedSecret(ctx context.Context, linkedsecr
 	linkedsecret.Status.CreatedSecretNamespace = secret.Namespace
 	linkedsecret.Status.LastScheduleExecution = &metav1.Time{Time: time.Now()}
 	linkedsecret.Status.KeepSecretOnDelete = linkedsecret.Spec.KeepSecretOnDelete
+	linkedsecret.Status.CurrentSchedule = linkedsecret.Spec.Schedule
 
 	if err := r.Status().Update(ctx, linkedsecret); err != nil {
 		return err
