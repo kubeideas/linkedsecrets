@@ -45,7 +45,7 @@ func (r *LinkedSecretReconciler) UpdateLinkedSecret(ctx context.Context, linkeds
 	}
 
 	// update existent secret
-	updateOpts := &client.UpdateOptions{}
+	updateOpts := &client.UpdateOptions{FieldManager: linkedsecret.Name}
 	if err := r.Update(ctx, &secret, updateOpts); err != nil {
 		r.Recorder.Event(linkedsecret, "Warning", "FailUpdating", err.Error())
 		linkedsecret.Status.CurrentSecretStatus = STATUSNOTSYNCHED
