@@ -44,6 +44,9 @@ func (r *LinkedSecretReconciler) UpdateLinkedSecret(ctx context.Context, linkeds
 		}
 	}
 
+	// check secret data changes
+	isEqual := r.checkDiff(ctx, linkedsecret, secret)
+
 	// update existent secret
 	updateOpts := &client.UpdateOptions{FieldManager: linkedsecret.Name}
 	if err := r.Update(ctx, &secret, updateOpts); err != nil {
@@ -53,6 +56,11 @@ func (r *LinkedSecretReconciler) UpdateLinkedSecret(ctx context.Context, linkeds
 			return err
 		}
 		return err
+	}
+
+	// Deployment rollout update
+	if !isEqual {
+		r.rolloutUpdate(ctx, linkedsecret)
 	}
 
 	// Suspend cronjob

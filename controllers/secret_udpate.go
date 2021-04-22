@@ -33,6 +33,9 @@ func (r *LinkedSecretReconciler) UpdateSecret(ctx context.Context, linkedsecret 
 		}
 	}
 
+	// check secret data changes
+	isEqual := r.checkDiff(ctx, linkedsecret, secret)
+
 	// update existent secret
 	updateOpts := &client.UpdateOptions{FieldManager: linkedsecret.Name}
 	if err := r.Update(ctx, &secret, updateOpts); err != nil {
@@ -45,6 +48,11 @@ func (r *LinkedSecretReconciler) UpdateSecret(ctx context.Context, linkedsecret 
 	}
 
 	log.V(1).Info("Synchronized secret data on schedule", "secret", fmt.Sprintf("%s/%s", secret.Namespace, secret.Name))
+
+	// Deployment rollout update
+	if !isEqual {
+		r.rolloutUpdate(ctx, linkedsecret)
+	}
 
 	return nil
 }
