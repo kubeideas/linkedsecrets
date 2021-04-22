@@ -23,16 +23,18 @@ import (
 type LinkedSecretSpec struct {
 
 	// +kubebuilder:validation:Enum={"Google","AWS"}
+	// +kubebuilder:validation:Required
 	// Supported cloud secret manager. Valid options: Google,AWS.
-	Provider string `json:"provider,required"`
+	Provider string `json:"provider"`
 
 	// +kubebuilder:validation:Enum={"PLAIN", "JSON"}
+	// +kubebuilder:validation:Required
 	// Supported formats: PLAIN and JSON
 	// "PLAIN" format key/value must be delimited by character "=".
 	// Empty lines, key without value and value without key will be skipped.
 	// Leading and trailing whitespaces will be ignored. Ex: password=pass12@#=+$% or password = pass12@#=+$% (with whitespaces).
 	// "JSON" format must be key/value format. Ex: {"pasword":"pass12@#=+$%","host":"myhost"}.
-	ProviderDataFormat string `json:"providerDataFormat,required"`
+	ProviderDataFormat string `json:"providerDataFormat"`
 
 	// +optional
 	// Extra options necessary to fetch secrets from Cloud secret manager.
@@ -65,6 +67,11 @@ type LinkedSecretSpec struct {
 	// +kubebuilder:default="OFF"
 	// Use this field keep secret after LinkedSecret deletion. Valid values: {"ON", "OFF"}
 	KeepSecretOnDelete string `json:"keepSecretOnDelete,omitempty"`
+
+	// +kubebuilder:validation:Type=string
+	// Deployment name which pods will be restarted if secret data key or value were changed.
+	// Pods rollout update will happen 5 seconds after secret was updated.
+	Deployment string `json:"deployment,omitempty"`
 }
 
 // LinkedSecretStatus defines the observed state of LinkedSecret
@@ -86,7 +93,7 @@ type LinkedSecretStatus struct {
 	//NextScheduleExecution  *metav1.Time `json:"nextScheduleExecution,omitempty"`
 
 	// Provider name currently being used.
-	CurrentProvider string `json:"currentProvider,required"`
+	CurrentProvider string `json:"currentProvider"`
 
 	// Provider options currently being used.
 	CurrentProviderOptions map[string]string `json:"currentProviderOptions,omitempty"`

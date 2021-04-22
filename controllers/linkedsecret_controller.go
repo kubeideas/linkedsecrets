@@ -44,6 +44,7 @@ type LinkedSecretReconciler struct {
 
 // +kubebuilder:rbac:groups=security.kubeideas.io,resources=linkedsecrets,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=security.kubeideas.io,resources=linkedsecrets/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;update;patch
 // +kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 
 // +kubebuilder:rbac:groups=core,resources=secrets,verbs=get;list;watch;create;update;patch;delete
@@ -78,12 +79,12 @@ func (r *LinkedSecretReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 	var secret corev1.Secret
 	secretName := client.ObjectKey{Namespace: linkedsecret.Namespace, Name: linkedsecret.Spec.SecretName}
 	if err := r.Get(ctx, secretName, &secret); err != nil {
-		log.V(1).Info("BEGIN RECONCILING - NEW SECRET", "secret", fmt.Sprintf("%s/%s", linkedsecret.Namespace, linkedsecret.Name))
+		log.V(1).Info("BEGIN RECONCILING - NEW SECRET", "secret", fmt.Sprintf("%s/%s", linkedsecret.Namespace, linkedsecret.Spec.SecretName))
 		// create new kubernetes secret but keep old one
 		if err := r.NewLinkedSecret(ctx, &linkedsecret); err != nil {
 			return ctrl.Result{}, err
 		}
-		log.V(1).Info("END RECONCILING - NEW SECRET", "secret", fmt.Sprintf("%s/%s", linkedsecret.Namespace, linkedsecret.Name))
+		log.V(1).Info("END RECONCILING - NEW SECRET", "secret", fmt.Sprintf("%s/%s", linkedsecret.Namespace, linkedsecret.Spec.SecretName))
 
 		return ctrl.Result{}, nil
 	}
