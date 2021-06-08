@@ -1,19 +1,3 @@
-/*
-
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 package controllers
 
 import (
@@ -28,13 +12,6 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-// encapsulate Linkedsecret name and spec
-type linkedSecretTest struct {
-	name      string
-	namespace string
-	spec      securityv1.LinkedSecretSpec
-}
-
 var _ = Describe("Linkedsecret controller", func() {
 
 	const (
@@ -42,11 +19,11 @@ var _ = Describe("Linkedsecret controller", func() {
 		INTERVAL = time.Millisecond * 100
 	)
 
-	var gcpPlain linkedSecretTest
-	var gcpJSON linkedSecretTest
+	var gcpPlain LinkedSecretTest
+	var gcpJSON LinkedSecretTest
 
 	BeforeEach(func() {
-		gcpPlain = linkedSecretTest{
+		gcpPlain = LinkedSecretTest{
 			name:      "google-example1",
 			namespace: "default",
 			spec: securityv1.LinkedSecretSpec{
@@ -59,7 +36,7 @@ var _ = Describe("Linkedsecret controller", func() {
 			},
 		}
 
-		gcpJSON = linkedSecretTest{
+		gcpJSON = LinkedSecretTest{
 			name:      "google-example2",
 			namespace: "default",
 			spec: securityv1.LinkedSecretSpec{
@@ -92,10 +69,7 @@ var _ = Describe("Linkedsecret controller", func() {
 				// Get linkedSecret
 				Eventually(func() bool {
 					err := k8sClient.Get(ctx, linkedSecretLookupKey, createdLinkedSecret)
-					if err != nil {
-						return false
-					}
-					return true
+					return err == nil
 				}, TIMEOUT, INTERVAL).Should(BeTrue())
 
 				// Check expected spec
@@ -155,10 +129,7 @@ var _ = Describe("Linkedsecret controller", func() {
 				// Get linkedSecret
 				Eventually(func() bool {
 					err := k8sClient.Get(ctx, linkedSecretLookupKey, createdLinkedSecret)
-					if err != nil {
-						return false
-					}
-					return true
+					return err == nil
 				}, TIMEOUT, INTERVAL).Should(BeTrue())
 
 				// Check expected spec

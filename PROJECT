@@ -1,7 +1,16 @@
 domain: kubeideas.io
-repo: linkedsecrets
+layout:
+- go.kubebuilder.io/v3
+projectName: linkedsecrets
+repo: kubeideas/linkedsecrets
 resources:
-- group: security
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: kubeideas.io
+  group: security
   kind: LinkedSecret
+  path: linkedsecrets/api/v1
   version: v1
-version: "2"
+version: "3"

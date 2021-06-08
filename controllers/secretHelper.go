@@ -19,14 +19,14 @@ func (r *LinkedSecretReconciler) checkDiff(ctx context.Context, linkedsecret *se
 	var currSecret corev1.Secret
 	secretName := client.ObjectKey{Namespace: linkedsecret.Namespace, Name: linkedsecret.Spec.SecretName}
 	if err := r.Get(ctx, secretName, &currSecret); err != nil {
-		log.V(1).Info("checkDiff - Secret not found", "secret", fmt.Sprintf("%s/%s", linkedsecret.Namespace, linkedsecret.Spec.SecretName))
+		log.V(1).Info("checkSecretDiff - Secret not found", "secret", fmt.Sprintf("%s/%s", linkedsecret.Namespace, linkedsecret.Spec.SecretName))
 		return false
 	}
 
 	// Compare both secret data
 	isEqual := reflect.DeepEqual(currSecret.Data, newSecret.Data)
 
-	log.V(1).Info("checkDiff succeed", "SecretIsEqual", isEqual)
+	log.V(1).Info("checkSecretDiff succeed", "IsEqual", isEqual)
 
 	return isEqual
 }

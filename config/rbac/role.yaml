@@ -50,6 +50,12 @@ rules:
 - apiGroups:
   - security.kubeideas.io
   resources:
+  - linkedsecrets/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - security.kubeideas.io
+  resources:
   - linkedsecrets/status
   verbs:
   - get

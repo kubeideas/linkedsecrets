@@ -24,8 +24,15 @@ func (r *LinkedSecretReconciler) GetAWSSecret(linkedsecret *securityv1.LinkedSec
 	region := linkedsecret.Spec.ProviderOptions["region"]
 	version := linkedsecret.Spec.ProviderOptions["version"]
 
+	// new cloud session
+	sess, err := session.NewSession(aws.NewConfig().WithRegion(region))
+	if err != nil {
+		fmt.Println("Error creating session ", err)
+		return nil, err
+	}
+
 	//Create a Secrets Manager client with informed region
-	svc := secretsmanager.New(session.New(), aws.NewConfig().WithRegion(region))
+	svc := secretsmanager.New(sess)
 
 	//prepare input with informed name and version
 	input := &secretsmanager.GetSecretValueInput{
