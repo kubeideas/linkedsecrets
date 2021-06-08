@@ -73,7 +73,7 @@ JSON secret creation can be done in AWS Console or using AWS CLI.
 
 AWS CLI example:
 
-Create file `[mysecret.txt]` with plain text:
+Create file `[mysecret.txt]` with json text:
 
 ```bash
 {

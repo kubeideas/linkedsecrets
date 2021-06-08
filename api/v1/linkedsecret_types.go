@@ -1,4 +1,6 @@
 /*
+Copyright 2021.
+
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -21,7 +23,6 @@ import (
 
 // LinkedSecretSpec defines the desired state of LinkedSecret
 type LinkedSecretSpec struct {
-
 	// +kubebuilder:validation:Enum={"Google","AWS"}
 	// +kubebuilder:validation:Required
 	// Supported cloud secret manager. Valid options: Google,AWS.
@@ -76,7 +77,6 @@ type LinkedSecretSpec struct {
 
 // LinkedSecretStatus defines the observed state of LinkedSecret
 type LinkedSecretStatus struct {
-
 	// if "CurrentSecretStatus = Synched" data between cloud provider and kubernetes secret were synchronized.
 	// if "CurrentSecretStatus = NotSynched" may have occured an error during synchronization process.
 	// Please check linkedsecret events for more details.
@@ -129,7 +129,7 @@ type LinkedSecretStatus struct {
 // +kubebuilder:resource:shortName=lns
 // +kubebuilder:storageversion
 
-// LinkedSecret enables declative synchronization between kubernetes secret and cloud secret manager solutions.
+// LinkedSecret is the Schema for the linkedsecrets API
 type LinkedSecret struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

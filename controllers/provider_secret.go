@@ -13,7 +13,7 @@ func (r *LinkedSecretReconciler) GetProviderSecret(linkedsecret *securityv1.Link
 	var err error
 	data := []byte{}
 	secret := corev1.Secret{}
-	secretMap := make(map[string][]byte)
+	var secretMap map[string][]byte
 
 	//retrieve Cloud secret data
 	switch linkedsecret.Spec.Provider {

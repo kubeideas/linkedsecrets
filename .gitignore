@@ -6,6 +6,7 @@
 *.so
 *.dylib
 bin
+testbin/*
 
 # Test binary, build with `go test -c`
 *.test
@@ -22,6 +23,7 @@ bin
 *.swp
 *.swo
 *~
+
 
 ## ignore install package
 install.zip

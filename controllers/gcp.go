@@ -25,12 +25,13 @@ func (r *LinkedSecretReconciler) GetGCPSecret(linkedsecret *securityv1.LinkedSec
 	// Create the client.
 	ctx := context.Background()
 	client, err := secretmanager.NewClient(ctx)
-	defer client.Close()
 
 	if err != nil {
 		log.V(1).Info("GCP Error creating client", name, err)
 		return nil, err
 	}
+	// defer close connection
+	defer client.Close()
 
 	// Build a request
 	req := &secretmanagerpb.AccessSecretVersionRequest{
