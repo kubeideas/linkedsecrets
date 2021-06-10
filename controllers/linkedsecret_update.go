@@ -15,12 +15,17 @@ func (r *LinkedSecretReconciler) UpdateLinkedSecret(ctx context.Context, linkeds
 	log := r.Log.WithValues("linkedsecret", fmt.Sprintf("%s/%s", linkedsecret.Namespace, linkedsecret.Name))
 
 	// Remove cronjob if schedule or keepSecretOnDelete were changed or synchronization was suspended
-	if linkedsecret.Status.CurrentSchedule != linkedsecret.Spec.Schedule ||
-		linkedsecret.Spec.Suspended ||
-		linkedsecret.Status.KeepSecretOnDelete != linkedsecret.Spec.KeepSecretOnDelete {
-		if err := r.RemoveCronJob(ctx, linkedsecret); err != nil {
-			return err
-		}
+	//if linkedsecret.Status.CurrentSchedule != linkedsecret.Spec.Schedule ||
+	//	linkedsecret.Spec.Suspended ||
+	//	linkedsecret.Status.KeepSecretOnDelete != linkedsecret.Spec.KeepSecretOnDelete {
+	//	if err := r.RemoveCronJob(ctx, linkedsecret); err != nil {
+	//		return err
+	//	}
+	//}
+
+	// Remove cronjob
+	if err := r.RemoveCronJob(ctx, linkedsecret); err != nil {
+		return err
 	}
 
 	// update secret with provider data
@@ -71,9 +76,14 @@ func (r *LinkedSecretReconciler) UpdateLinkedSecret(ctx context.Context, linkeds
 	}
 
 	// create secret cronjob with new schedule
-	if linkedsecret.Spec.Schedule != "" &&
-		!linkedsecret.Spec.Suspended && len(r.Cronjob) == 0 {
-		r.AddCronjob(ctx, linkedsecret)
+	// if linkedsecret.Spec.Schedule != "" &&
+	// 	!linkedsecret.Spec.Suspended && len(r.Cronjob) == 0 {
+	// 	r.AddCronjob(ctx, linkedsecret)
+	// }
+
+	// Add cronjob
+	if err := r.AddCronjob(ctx, linkedsecret); err != nil {
+		return err
 	}
 
 	// update linkedsecret status
