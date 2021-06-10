@@ -6,6 +6,7 @@ Supported Cloud secret solutions:
 
 * Google Secret Manager
 * AWS Secret Manager
+* Azure Keyvault Secrets
 
 ## Architecture
 
