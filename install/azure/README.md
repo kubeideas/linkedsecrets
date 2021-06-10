@@ -1,13 +1,12 @@
 # Linkedsecrets installation
 
-Before installing Linkedsecrets operator it is necessary to create a `Google Service account` with the following details:
+## Requirements
 
-* Role `Secret Manager Secret Accessor` permission.
-* Create JSON key file and name it as `gcp-credentials.json` in this directory.
+* **AZURE_TENANT_ID**, **AZURE_CLIENT_ID** and **AZURE_CLIENT_SECRET** with permissions to get and list secrets on Azure Keyvault.
 
 **[IMPORTANT]** Avoid security issues and grant access only to secrets strictly relevant to your Kubernetes cluster project.
 
-## Namespace and GCP credentials secret
+## Namespace and Azure credentials secret
 
 ```bash
 ./create_secret.sh
@@ -16,7 +15,7 @@ Before installing Linkedsecrets operator it is necessary to create a `Google Ser
 ## CRD's and controller
 
 ```bash
-kubectl apply -f install-linkedsecret-gcp.yaml
+kubectl apply -f install-linkedsecret-azure.yaml
 ```
 
 ## Verifying installation
@@ -37,15 +36,31 @@ kubectl explain linkedsecret.spec
 kubectl explain linkedsecret.status
 ```
 
-## Google Secret Manager data format
+## Azure Keyvault Secrets data format
 
 Linkedsecret support `"PLAIN"` format and `"JSON"` format.
 
 ### PLAIN format
 
 This format must use "=" to separate key/value. White spaces and white lines are allowed and will be skipped during payload parse.
+PLAIN secret creation can be done in Azure Console or using Azure CLI.
 
 Example:
+
+Create resource group:
+
+```bash
+az group create --name "kubernetes" --location "EastUS" 
+```
+
+Create keyvault:
+
+```bash
+
+az keyvault create --name "lnsvault" --resource-group "kubernetes" --location "EastUS" 
+```
+
+Create file `[mysecret.txt]` with PLAIN text:
 
 ```bash
 username = admin
@@ -54,11 +69,28 @@ password=teste123
 host = myhost01
 ```
 
+Create a secret with file `[mysecret.txt]` :
+
+```bash
+az keyvault secret set --vault-name "lnsvault" --name "mysecret" --file "./mysecret.txt"
+```
+
 ### JSON format
 
-This format support a simple key/value JSON.
+JSON secret creation can be done in Azure Console or using Azure CLI.
 
-Example:
+```bash
+az group create --name "kubernetes" --location "EastUS" 
+```
+
+Create keyvault:
+
+```bash
+
+az keyvault create --name "lnsvault" --resource-group "kubernetes" --location "EastUS" 
+```
+
+Create file `[mysecret.txt]` with json text:
 
 ```bash
 {
@@ -68,9 +100,15 @@ Example:
 }
 ```
 
+Create a secret with encoded file `[mysecret.txt]`:
+
+```bash
+az keyvault secret set --vault-name "lnsvault" --name "mysecret" --file "./mysecret.txt"
+```
+
 ## Linkedsecrets Spec Fields
 
-Follow bellow all spec fields supported by Linkedsecrets when using Google Secret Manager:
+Follow bellow all spec fields supported by Linkedsecrets when using Azure Keyvault Secrets:
 
 ``` yaml
 apiVersion: security.kubeideas.io/v1
@@ -80,12 +118,12 @@ metadata:
 spec:
   deployment: <DEPLOYMENT-NAME>
   keepSecretOnDelete: <true | false>
-  provider: Google
+  provider: Azure
   providerDataFormat: <JSON | PLAIN>
   providerOptions:
-    project: <GCP-PROJECT-ID>
-    secret: <GCP-SECRET-NAME>
-    version: <latest | "1" | "2" | ...>  
+    keyvault: <AZURE-KEYVAULT-NAME>
+    secret: <AZURE-SECRET-NAME>
+    version: <AWZURE-SECRET-VERSION-ID> 
   secretName: <SECRET-NAME-CREATED-AND-MAINTAINED-BY-LINKEDSECRETS-ON-KUBERNETES>
   schedule: <"@every 10m" | ANY-OTHER-SYNCHRONIZATION-INTERVAL>
   suspended: <true | false>
@@ -130,11 +168,10 @@ Pre-defined cron expressions and Classic cron expressions are accepted.
 | "*/20 * * * * *" | Run every 20 seconds                 |
 | "0 */5 * * * *"  | Run every 5 minutes                  |
 | "0 0 * * * *"    | Run once an hour, beginning of hour  |
-| "0 0 * * * *"    | Run once an hour, beginning of hour  |
 | "0 0 0 * * *"    | Run once a day, midnight             |
 |                  |                                      |
 
-**[IMPORTANT]** Have in mind that Google cloud will charge you on each secret created and access operations. Having said that, tune the schedule accordingly.
+**[IMPORTANT]** Have in mind that Azure cloud will charge you on each secret created and access operations. Having said that, tune the schedule accordingly.
 
 ### Suspended Field
 
@@ -142,4 +179,4 @@ Use this field any time you need to stop data synchronizatin between Kubernetes 
 
 ## References
 
-[Google Secret Manager](https://cloud.google.com/secret-manager/docs/configuring-secret-manager)
+[Azure Keyvault Secrets](https://docs.microsoft.com/en-us/azure/key-vault/)

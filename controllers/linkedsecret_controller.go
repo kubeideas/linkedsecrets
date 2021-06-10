@@ -110,20 +110,20 @@ func (r *LinkedSecretReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	}
 
 	// Recreate schedule if controller was restarted
-	if !linkedsecret.Spec.Suspended && linkedsecret.Status.CronJobStatus != JOBFAILPARSESCHEDULE {
-		if _, ok := r.Cronjob[linkedsecret.UID]; !ok {
-			log.V(1).Info("BEGIN RECONCILING - RESTART MANAGER", "schedule", "recreated")
+	//if !linkedsecret.Spec.Suspended && linkedsecret.Status.CronJobStatus != JOBFAILPARSESCHEDULE {
+	if _, ok := r.Cronjob[linkedsecret.UID]; !ok {
+		log.V(1).Info("BEGIN RECONCILING - RESTART MANAGER", "schedule", "recreated")
 
-			// skip linkedsecrets without schedule
-			if linkedsecret.Spec.Schedule != "" {
-				// Add cronjob
-				r.AddCronjob(ctx, &linkedsecret)
-			}
-
-			log.V(1).Info("END RECONCILING - RESTART MANAGER", "schedule", "recreated")
-			return ctrl.Result{}, nil
+		// skip linkedsecrets without schedule
+		if linkedsecret.Spec.Schedule != "" {
+			// Add cronjob
+			r.AddCronjob(ctx, &linkedsecret)
 		}
+
+		log.V(1).Info("END RECONCILING - RESTART MANAGER", "schedule", "recreated")
+		return ctrl.Result{}, nil
 	}
+	//}
 
 	return ctrl.Result{}, nil
 }

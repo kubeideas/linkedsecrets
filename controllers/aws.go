@@ -14,6 +14,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/secretsmanager"
 )
 
+// Credentials will be provided by environment variables:
+// AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
 // GetAWSSecret return secret data from AWS Secret Manage
 func (r *LinkedSecretReconciler) GetAWSSecret(linkedsecret *securityv1.LinkedSecret) ([]byte, error) {
 
@@ -22,7 +24,13 @@ func (r *LinkedSecretReconciler) GetAWSSecret(linkedsecret *securityv1.LinkedSec
 	// get provider options informed in linkedsecret spec
 	name := linkedsecret.Spec.ProviderOptions["secret"]
 	region := linkedsecret.Spec.ProviderOptions["region"]
-	version := linkedsecret.Spec.ProviderOptions["version"]
+	// set default "AWSCURRENT" if providerOption version was not specified
+	version := "AWSCURRENT"
+
+	// get version if defined
+	if _, ok := linkedsecret.Spec.ProviderOptions["version"]; ok {
+		version = linkedsecret.Spec.ProviderOptions["version"]
+	}
 
 	// new cloud session
 	sess, err := session.NewSession(aws.NewConfig().WithRegion(region))

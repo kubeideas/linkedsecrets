@@ -41,7 +41,7 @@ func (r *LinkedSecretReconciler) NewLinkedSecret(ctx context.Context, linkedsecr
 
 	// Set the controller reference so that we know which object owns this.
 	// Secret will be deleted when Linkedsecret is deleted.
-	if linkedsecret.Spec.KeepSecretOnDelete == KEEPSECRETOFF {
+	if !linkedsecret.Spec.KeepSecretOnDelete {
 		if err := ctrl.SetControllerReference(linkedsecret, &secret, r.Scheme); err != nil {
 			return err
 		}

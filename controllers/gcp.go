@@ -17,7 +17,13 @@ func (r *LinkedSecretReconciler) GetGCPSecret(linkedsecret *securityv1.LinkedSec
 	// get provider options informed in linkedsecret spec
 	project := linkedsecret.Spec.ProviderOptions["project"]
 	name := linkedsecret.Spec.ProviderOptions["secret"]
-	version := linkedsecret.Spec.ProviderOptions["version"]
+	// set default "latest" if providerOption version was not specified
+	version := "latest"
+
+	// get version if defined
+	if _, ok := linkedsecret.Spec.ProviderOptions["version"]; ok {
+		version = linkedsecret.Spec.ProviderOptions["version"]
+	}
 
 	// Secret name with its path
 	secretPath := "projects/" + project + "/secrets/" + name + "/versions/" + version
