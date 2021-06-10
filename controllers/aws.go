@@ -24,7 +24,13 @@ func (r *LinkedSecretReconciler) GetAWSSecret(linkedsecret *securityv1.LinkedSec
 	// get provider options informed in linkedsecret spec
 	name := linkedsecret.Spec.ProviderOptions["secret"]
 	region := linkedsecret.Spec.ProviderOptions["region"]
-	version := linkedsecret.Spec.ProviderOptions["version"]
+	// set default "AWSCURRENT" if providerOption version was not specified
+	version := "AWSCURRENT"
+
+	// get version if defined
+	if _, ok := linkedsecret.Spec.ProviderOptions["version"]; ok {
+		version = linkedsecret.Spec.ProviderOptions["version"]
+	}
 
 	// new cloud session
 	sess, err := session.NewSession(aws.NewConfig().WithRegion(region))
