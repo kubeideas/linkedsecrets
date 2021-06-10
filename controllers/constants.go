@@ -8,14 +8,13 @@ const (
 	JOBFAILPARSESCHEDULE = "FailParseSchedule"
 	STATUSSYNCHED        = "Synched"
 	STATUSNOTSYNCHED     = "NotSynched"
-	KEEPSECRETON         = "ON"
-	KEEPSECRETOFF        = "OFF"
 )
 
 // Providers constants
 const (
 	GOOGLE = "Google"
 	AWS    = "AWS"
+	AZURE  = "Azure"
 )
 
 // Provider data format

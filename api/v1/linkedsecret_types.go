@@ -23,9 +23,9 @@ import (
 
 // LinkedSecretSpec defines the desired state of LinkedSecret
 type LinkedSecretSpec struct {
-	// +kubebuilder:validation:Enum={"Google","AWS"}
+	// +kubebuilder:validation:Enum={"Google","AWS","Azure"}
 	// +kubebuilder:validation:Required
-	// Supported cloud secret manager. Valid options: Google,AWS.
+	// Supported cloud secret manager. Valid options: Google,AWS,Azure.
 	Provider string `json:"provider"`
 
 	// +kubebuilder:validation:Enum={"PLAIN", "JSON"}
@@ -63,11 +63,10 @@ type LinkedSecretSpec struct {
 	// Use this field to suspend cronjob temporarily. Valid values: {true, false}
 	Suspended bool `json:"suspended,omitempty"`
 
-	// +kubebuilder:validation:Type=string
-	// +kubebuilder:validation:Required
-	// +kubebuilder:default="OFF"
-	// Use this field keep secret after LinkedSecret deletion. Valid values: {"ON", "OFF"}
-	KeepSecretOnDelete string `json:"keepSecretOnDelete,omitempty"`
+	// +kubebuilder:validation:Type=boolean
+	// +optional
+	// Use this field keep secret after LinkedSecret deletion. Valid values: {true, false}
+	KeepSecretOnDelete bool `json:"keepSecretOnDelete,omitempty"`
 
 	// +kubebuilder:validation:Type=string
 	// Deployment name which pods will be restarted if secret data key or value were changed.
@@ -113,8 +112,8 @@ type LinkedSecretStatus struct {
 	// Cronjob current schedule.
 	CurrentSchedule string `json:"currentSchedule,omitempty"`
 
-	// If value is "ON" secret wont be deleted after LinkedSecret deletion.
-	KeepSecretOnDelete string `json:"keepSecretOnDelete,omitempty"`
+	// If value is "true" secret wont be deleted after LinkedSecret deletion.
+	KeepSecretOnDelete bool `json:"keepSecretOnDelete,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -122,7 +121,7 @@ type LinkedSecretStatus struct {
 // +kubebuilder:printcolumn:JSONPath=".status.currentProvider",name="provider",type="string"
 // +kubebuilder:printcolumn:JSONPath=".status.createdSecretStatus",name="status",type="string"
 // +kubebuilder:printcolumn:JSONPath=".status.createdSecret",name="secret",type="string"
-// +kubebuilder:printcolumn:JSONPath=".status.keepSecretOnDelete",name="keep-on-delete",type="string"
+// +kubebuilder:printcolumn:JSONPath=".status.keepSecretOnDelete",name="keep-on-delete",type="boolean"
 // +kubebuilder:printcolumn:JSONPath=".status.lastScheduleExecution",name="last-sync",type="string"
 // +kubebuilder:printcolumn:JSONPath=".status.cronJobStatus",name="cron-job-status",type="string"
 // +kubebuilder:printcolumn:JSONPath=".status.currentSchedule",name="current-schedule",type="string"

@@ -14,7 +14,7 @@ func (r *LinkedSecretReconciler) UpdateLinkedSecret(ctx context.Context, linkeds
 
 	log := r.Log.WithValues("linkedsecret", fmt.Sprintf("%s/%s", linkedsecret.Namespace, linkedsecret.Name))
 
-	// Change schedule for a valid old job
+	// Remove cronjob if schedule or keepSecretOnDelete were changed or synchronization was suspended
 	if linkedsecret.Status.CurrentSchedule != linkedsecret.Spec.Schedule ||
 		linkedsecret.Spec.Suspended ||
 		linkedsecret.Status.KeepSecretOnDelete != linkedsecret.Spec.KeepSecretOnDelete {
@@ -38,7 +38,7 @@ func (r *LinkedSecretReconciler) UpdateLinkedSecret(ctx context.Context, linkeds
 
 	// Set the controller reference so that we know which object owns this.
 	// Secret will be deleted when Linkedsecret is deleted.
-	if linkedsecret.Spec.KeepSecretOnDelete == KEEPSECRETOFF {
+	if !linkedsecret.Spec.KeepSecretOnDelete {
 		if err := ctrl.SetControllerReference(linkedsecret, &secret, r.Scheme); err != nil {
 			return err
 		}
@@ -65,10 +65,6 @@ func (r *LinkedSecretReconciler) UpdateLinkedSecret(ctx context.Context, linkeds
 
 	// Suspend cronjob
 	if linkedsecret.Spec.Suspended {
-		// remove cronjob
-		// if err := r.RemoveCronJob(ctx, linkedsecret); err != nil {
-		// 	return nil
-		// }
 		//set cronjob suspended
 		linkedsecret.Status.CronJobStatus = JOBSUSPENDED
 		r.Recorder.Event(linkedsecret, "Warning", "Cronjob suspended", linkedsecret.Name)
