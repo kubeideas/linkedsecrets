@@ -85,11 +85,13 @@ spec:
   providerOptions:
     project: <GCP-PROJECT-ID>
     secret: <GCP-SECRET-NAME>
-    version: <latest | ANY-OTHER-VERSION>  
-  secretName: <SECRET-NAME-CREATED-AND-MAINTAINED-BY-LINKEDSECRETS>
+    version: <latest | "1" | "2" | ...>  
+  secretName: <SECRET-NAME-CREATED-AND-MAINTAINED-BY-LINKEDSECRETS-ON-KUBERNETES>
   schedule: <"@every 10m" | ANY-OTHER-SYNCHRONIZATION-INTERVAL>
   suspended: <true | false>
 ```
+
+**[IMPORTANT]** Secret latest version will be used if field version is omitted.
 
 ### Deployment Field
 
@@ -132,7 +134,7 @@ Pre-defined cron expressions and Classic cron expressions are accepted.
 | "0 0 0 * * *"    | Run once a day, midnight             |
 |                  |                                      |
 
-**[IMPORTANT]** Have in mind that Google cloud will charge you based on secret access. Having said that, tune the schedule accordingly.
+**[IMPORTANT]** Have in mind that Google cloud will charge you on each secret created and access operations. Having said that, tune the schedule accordingly.
 
 ### Suspended Field
 
