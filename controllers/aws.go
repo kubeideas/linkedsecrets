@@ -14,6 +14,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/secretsmanager"
 )
 
+// Credentials will be provided by environment variables:
+// AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
 // GetAWSSecret return secret data from AWS Secret Manage
 func (r *LinkedSecretReconciler) GetAWSSecret(linkedsecret *securityv1.LinkedSecret) ([]byte, error) {
 
