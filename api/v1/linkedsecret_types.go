@@ -38,8 +38,10 @@ type LinkedSecretSpec struct {
 	ProviderDataFormat string `json:"providerDataFormat"`
 
 	// +optional
-	// Extra options necessary to fetch secrets from Cloud secret manager.
-	// Example GCP: project: <PROJECT-ID>, secret: <GCP-SECRET-NAME>, version: <GCP-SECRET-VERSION>.
+	// Extra options necessary to fetch Cloud secret. If version is omitted, secret latest version will be used regardeless of Cloud provider.
+	// Example GCP: project: <PROJECT-ID>, secret: <GCP-SECRET-NAME>, version: <latest|"1"|"2"|...>.
+	// Example AWS: region: <AWS-REGION>, secret: <AWS-SECRET-NAME>, version: <AWSPREVIOUS|AWSCURRENT>.
+	// Example Azure: keyvault: <KEYVAULT-NAME>, secret: <AZURE-SECRET-NAME>, version: <AZURE-SECRET-VERSION-ID>.
 	ProviderOptions map[string]string `json:"providerOptions,omitempty"`
 
 	// +kubebuilder:validation:Type=string

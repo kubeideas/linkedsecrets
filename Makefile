@@ -88,6 +88,11 @@ gen-aws: manifests
 	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
 	$(KUSTOMIZE) build config/aws > install/aws/install-linkedsecret-aws.yaml	
 
+# Generate Azure manifests 
+gen-azure: manifests
+	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
+	$(KUSTOMIZE) build config/azure > install/azure/install-linkedsecret-azure.yaml		
+
 deploy: manifests kustomize ## Deploy controller to the K8s cluster specified in ~/.kube/config.
 	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
 	$(KUSTOMIZE) build config/default | kubectl apply -f -
