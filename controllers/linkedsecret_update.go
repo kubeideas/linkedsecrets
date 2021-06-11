@@ -75,15 +75,11 @@ func (r *LinkedSecretReconciler) UpdateLinkedSecret(ctx context.Context, linkeds
 		r.Recorder.Event(linkedsecret, "Warning", "Cronjob suspended", linkedsecret.Name)
 	}
 
-	// create secret cronjob with new schedule
-	// if linkedsecret.Spec.Schedule != "" &&
-	// 	!linkedsecret.Spec.Suspended && len(r.Cronjob) == 0 {
-	// 	r.AddCronjob(ctx, linkedsecret)
-	// }
-
 	// Add cronjob
-	if err := r.AddCronjob(ctx, linkedsecret); err != nil {
-		return err
+	if !linkedsecret.Spec.Suspended {
+		if err := r.AddCronjob(ctx, linkedsecret); err != nil {
+			return err
+		}
 	}
 
 	// update linkedsecret status
@@ -100,13 +96,14 @@ func (r *LinkedSecretReconciler) UpdateLinkedSecret(ctx context.Context, linkeds
 	}
 
 	//debug info
-	log.V(1).Info("Update linkedsecret", "CurrentSecretStatus", linkedsecret.Status.CreatedSecretNamespace)
+	log.V(1).Info("Update linkedsecret", "CurrentSecretStatus", linkedsecret.Status.CurrentSecretStatus)
 	log.V(1).Info("Update linkedsecret", "CreatedSecret", linkedsecret.Status.CreatedSecret)
 	log.V(1).Info("Update linkedsecret", "CreatedSecretNamespace", linkedsecret.Status.CreatedSecretNamespace)
 	log.V(1).Info("Update linkedsecret", "CurrentProvider", linkedsecret.Status.CurrentProvider)
 	log.V(1).Info("Update linkedsecret", "CurrentProviderOptions", linkedsecret.Status.CurrentProviderOptions)
 	log.V(1).Info("Update linkedsecret", "KeepSecretOnDelete", linkedsecret.Status.KeepSecretOnDelete)
 	log.V(1).Info("Update linkedsecret", "CurrentSchedule", linkedsecret.Status.CurrentSchedule)
+	log.V(1).Info("Update linkedsecret", "CronJobStatus", linkedsecret.Status.CronJobStatus)
 	log.V(1).Info("Update linkedsecret", "Cronjob map", len(r.Cronjob))
 
 	// Record linkedsecret updated

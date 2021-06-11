@@ -61,6 +61,11 @@ func (r *LinkedSecretReconciler) NewLinkedSecret(ctx context.Context, linkedsecr
 
 	log.V(1).Info("Synchronize secret data on creation", "secret", fmt.Sprintf("%s/%s", secret.Namespace, secret.Name))
 
+	// set status for linkedsecret without synchronization
+	if linkedsecret.Spec.Suspended {
+		linkedsecret.Status.CronJobStatus = JOBSUSPENDED
+	}
+
 	// update linkedsecret status
 	linkedsecret.Status.CurrentSecretStatus = STATUSSYNCHED
 	linkedsecret.Status.CreatedSecret = secret.Name
@@ -78,7 +83,9 @@ func (r *LinkedSecretReconciler) NewLinkedSecret(ctx context.Context, linkedsecr
 
 	// create secret cronjob if a schedule was defined
 	if linkedsecret.Spec.Schedule != "" && !linkedsecret.Spec.Suspended {
-		r.AddCronjob(ctx, linkedsecret)
+		if err := r.AddCronjob(ctx, linkedsecret); err != nil {
+			return err
+		}
 	}
 
 	return nil

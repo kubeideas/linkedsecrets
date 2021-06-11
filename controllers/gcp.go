@@ -14,6 +14,15 @@ func (r *LinkedSecretReconciler) GetGCPSecret(linkedsecret *securityv1.LinkedSec
 
 	log := r.Log.WithValues("linkedsecret", fmt.Sprintf("%s/%s", linkedsecret.Namespace, linkedsecret.Name))
 
+	// check required provider options
+	if _, ok := linkedsecret.Spec.ProviderOptions["project"]; !ok {
+		return nil, &InvalidGoogleCloudProject{}
+	}
+
+	if _, ok := linkedsecret.Spec.ProviderOptions["secret"]; !ok {
+		return nil, &InvalidSecretOption{}
+	}
+
 	// get provider options informed in linkedsecret spec
 	project := linkedsecret.Spec.ProviderOptions["project"]
 	name := linkedsecret.Spec.ProviderOptions["secret"]
