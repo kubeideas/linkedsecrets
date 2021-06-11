@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	securityv1 "linkedsecrets/api/v1"
+	"time"
 
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/keyvault/keyvault"
 	kvauth "github.com/Azure/azure-sdk-for-go/services/keyvault/auth"
@@ -16,9 +17,19 @@ func (r *LinkedSecretReconciler) GetAzureSecret(linkedsecret *securityv1.LinkedS
 
 	log := r.Log.WithValues("linkedsecret", fmt.Sprintf("%s/%s", linkedsecret.Namespace, linkedsecret.Name))
 
+	// check required provider options
+	if _, ok := linkedsecret.Spec.ProviderOptions["keyvault"]; !ok {
+		return nil, &InvalidAzureKeyvault{}
+	}
+
+	if _, ok := linkedsecret.Spec.ProviderOptions["secret"]; !ok {
+		return nil, &InvalidSecretOption{}
+	}
+
 	// get provider options informed in linkedsecret spec
 	kvName := linkedsecret.Spec.ProviderOptions["keyvault"]
 	name := linkedsecret.Spec.ProviderOptions["secret"]
+
 	// set default "" if providerOption version was not specified
 	// "" means latest secret version
 	version := ""
@@ -37,6 +48,8 @@ func (r *LinkedSecretReconciler) GetAzureSecret(linkedsecret *securityv1.LinkedS
 
 	//create session
 	basicClient := keyvault.New()
+	basicClient.RetryAttempts = 1
+	basicClient.RetryDuration = 1 * time.Second
 	basicClient.Authorizer = authorizer
 
 	// get secret

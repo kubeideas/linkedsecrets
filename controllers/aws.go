@@ -21,9 +21,19 @@ func (r *LinkedSecretReconciler) GetAWSSecret(linkedsecret *securityv1.LinkedSec
 
 	log := r.Log.WithValues("linkedsecret", fmt.Sprintf("%s/%s", linkedsecret.Namespace, linkedsecret.Name))
 
+	// check required provider options
+	if _, ok := linkedsecret.Spec.ProviderOptions["region"]; !ok {
+		return nil, &InvalidAWSRegion{}
+	}
+
+	if _, ok := linkedsecret.Spec.ProviderOptions["secret"]; !ok {
+		return nil, &InvalidSecretOption{}
+	}
+
 	// get provider options informed in linkedsecret spec
 	name := linkedsecret.Spec.ProviderOptions["secret"]
 	region := linkedsecret.Spec.ProviderOptions["region"]
+
 	// set default "AWSCURRENT" if providerOption version was not specified
 	version := "AWSCURRENT"
 
