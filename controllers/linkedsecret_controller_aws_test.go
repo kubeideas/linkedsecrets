@@ -12,7 +12,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-var _ = Describe("Linkedsecret controller", func() {
+var _ = Describe("Linkedsecret controller AWS", func() {
 
 	const (
 		TIMEOUT  = time.Second * 60
