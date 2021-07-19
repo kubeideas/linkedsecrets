@@ -82,9 +82,7 @@ func (r *LinkedSecretReconciler) GetAWSSecret(linkedsecret *securityv1.LinkedSec
 			return data, err
 
 		}
-		//decodedBinarySecret = string(decodedBinarySecretBytes[:len])
-		//fmt.Println("secretString = ", secretString)
-		//fmt.Println("decodedBinarySecret = ", decodedBinarySecret)
+
 	}
 
 	log.V(1).Info("AWS return secret", "secret", name)
