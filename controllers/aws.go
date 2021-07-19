@@ -16,7 +16,7 @@ import (
 
 // Credentials will be provided by environment variables:
 // AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
-// GetAWSSecret return secret data from AWS Secret Manage
+// GetAWSSecret return secret data from AWS Secret Manager
 func (r *LinkedSecretReconciler) GetAWSSecret(linkedsecret *securityv1.LinkedSecret) ([]byte, error) {
 
 	log := r.Log.WithValues("linkedsecret", fmt.Sprintf("%s/%s", linkedsecret.Namespace, linkedsecret.Name))
