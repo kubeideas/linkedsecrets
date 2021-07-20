@@ -42,6 +42,7 @@ type LinkedSecretSpec struct {
 	// Example GCP: project: <PROJECT-ID>, secret: <GCP-SECRET-NAME>, version: <latest|"1"|"2"|...>.
 	// Example AWS: region: <AWS-REGION>, secret: <AWS-SECRET-NAME>, version: <AWSPREVIOUS|AWSCURRENT>.
 	// Example Azure: keyvault: <KEYVAULT-NAME>, secret: <AZURE-SECRET-NAME>, version: <AZURE-SECRET-VERSION-ID>.
+	// Example IBM: secretManagerInstanceId: <SECRET-MANAGER-INSTANCE-UUID> , secretId: <IBM-SECRET-UUID>, region: <IBM-REGION>
 	ProviderOptions map[string]string `json:"providerOptions,omitempty"`
 
 	// +kubebuilder:validation:Type=string

@@ -102,6 +102,9 @@ gen-ibm: manifests
 	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
 	$(KUSTOMIZE) build config/ibm > install/ibm/install-linkedsecret-ibm.yaml	
 
+# Generate all manifests
+gen-all: gen-gcp gen-aws gen-azure gen-ibm
+
 ## END MY CUSTOMIZATIONS
 
 deploy: manifests kustomize ## Deploy controller to the K8s cluster specified in ~/.kube/config.
