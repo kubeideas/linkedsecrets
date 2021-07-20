@@ -135,7 +135,7 @@ Pre-defined cron expressions and Classic cron expressions are accepted.
 | "0 0 0 * * *"    | Run once a day, midnight             |
 |                  |                                      |
 
-**[IMPORTANT]** Have in mind that Google cloud will charge you on each secret created and access operations. Having said that, tune the schedule accordingly.
+**[IMPORTANT]** Have in mind that IBM cloud will charge you on each secret created and access operations. Having said that, tune the schedule accordingly.
 
 ### Suspended Field
 
