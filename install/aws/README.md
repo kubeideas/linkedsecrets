@@ -55,16 +55,10 @@ password=teste123
 host = myhost01
 ```
 
-Encode file `[mysecret.txt]`:
+Create AWS secret with encoded file `[mysecret.txt]` using AWS CLI:
 
 ```bash
-cat mysecret.txt |base64 > mysecret-encoded.txt
-```
-
-Create a secret with encoded file `[mysecret-encoded.txt]` using AWS CLI:
-
-```bash
-aws secretsmanager create-secret --name mysecret --secret-binary=fileb://mysecret-encoded.txt
+aws secretsmanager create-secret --name mysecret --secret-binary fileb://mysecret.txt
 ```
 
 ### JSON format
@@ -83,10 +77,10 @@ Create file `[mysecret.txt]` with json text:
 }
 ```
 
-Create a secret with encoded file `[mysecret.txt]` using AWS CLI:
+Create AWS secret with encoded file `[mysecret.txt]` using AWS CLI:
 
 ```bash
-aws secretsmanager create-secret --name mysecret --secret-binary=file://mysecret.txt
+aws secretsmanager create-secret --name mysecret --secret-binary fileb://mysecret.txt
 ```
 
 ## Linkedsecrets Spec Fields
