@@ -71,18 +71,17 @@ func (r *LinkedSecretReconciler) GetAWSSecret(linkedsecret *securityv1.LinkedSec
 	//var secretString, decodedBinarySecret string
 	var data []byte
 	if result.SecretString != nil {
-		//secretString = *result.SecretString
+		fmt.Println("SECRET-STRING = ", string(result.SecretBinary))
 		data = []byte(*result.SecretString)
 	} else {
-		//decode binary secret
-		data = make([]byte, base64.StdEncoding.DecodedLen(len(result.SecretBinary)))
-		_, err := base64.StdEncoding.Decode(data, result.SecretBinary)
-		if err != nil {
-			log.V(1).Info("AWS Error decoding secret", name, err)
-			return data, err
-
+		// if SecretBinary base64 decoding returns any error, it will be considered not encoded.
+		if decSecretBinary, err := base64.StdEncoding.DecodeString(string(result.SecretBinary)); err == nil {
+			data = decSecretBinary
+		} else {
+			log.V(1).Info("Secret returned from AWS may be not encoded", "Error", err)
+			log.V(1).Info("AWS secret will be assigned directly", "notDecoded", "SecretBinary")
+			data = result.SecretBinary
 		}
-
 	}
 
 	log.V(1).Info("AWS return secret", "secret", name)
