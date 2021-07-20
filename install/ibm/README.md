@@ -73,7 +73,7 @@ Example:
 
 ## Linkedsecrets Spec Fields
 
-Follow bellow all spec fields supported by Linkedsecrets when using Google Secret Manager:
+Follow bellow all spec fields supported by Linkedsecrets when using IBM Secret Manager:
 
 ``` yaml
 apiVersion: security.kubeideas.io/v1
