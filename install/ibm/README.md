@@ -144,4 +144,5 @@ Use this field any time you need to stop data synchronizatin between Kubernetes 
 ## References
 
 [IBM Secret Manager](https://cloud.ibm.com/docs/secrets-manager?topic=secrets-manager-getting-started)
+
 [IBM Secret Manager API](https://cloud.ibm.com/apidocs/secrets-manager?code=go#create-secret)
