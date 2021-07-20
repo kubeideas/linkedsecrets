@@ -23,9 +23,9 @@ import (
 
 // LinkedSecretSpec defines the desired state of LinkedSecret
 type LinkedSecretSpec struct {
-	// +kubebuilder:validation:Enum={"Google","AWS","Azure"}
+	// +kubebuilder:validation:Enum={"Google","AWS","Azure","IBM"}
 	// +kubebuilder:validation:Required
-	// Supported cloud secret manager. Valid options: Google,AWS,Azure.
+	// Supported cloud secret manager. Valid options: Google,AWS,Azure,IBM.
 	Provider string `json:"provider"`
 
 	// +kubebuilder:validation:Enum={"PLAIN", "JSON"}

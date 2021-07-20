@@ -23,6 +23,8 @@ func (r *LinkedSecretReconciler) GetProviderSecret(linkedsecret *securityv1.Link
 		data, err = r.GetAWSSecret(linkedsecret)
 	case AZURE:
 		data, err = r.GetAzureSecret(linkedsecret)
+	case IBM:
+		data, err = r.GetIBMSecret(linkedsecret)
 	}
 
 	//return error retrieving Cloud secret data

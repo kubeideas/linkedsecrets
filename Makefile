@@ -78,6 +78,10 @@ install: manifests kustomize ## Install CRDs into the K8s cluster specified in ~
 uninstall: manifests kustomize ## Uninstall CRDs from the K8s cluster specified in ~/.kube/config.
 	$(KUSTOMIZE) build config/crd | kubectl delete -f -
 
+## BEGIN MY CUSTOMIZATIONS
+docker-build-no-test: ## Build docker image with the manager.
+	docker build -t ${IMG} .
+
 # Generate GCP manifests 
 gen-gcp: manifests
 	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
@@ -92,6 +96,13 @@ gen-aws: manifests
 gen-azure: manifests
 	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
 	$(KUSTOMIZE) build config/azure > install/azure/install-linkedsecret-azure.yaml		
+
+# Generate IBM manifests 
+gen-ibm: manifests
+	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
+	$(KUSTOMIZE) build config/ibm > install/ibm/install-linkedsecret-ibm.yaml	
+
+## END MY CUSTOMIZATIONS
 
 deploy: manifests kustomize ## Deploy controller to the K8s cluster specified in ~/.kube/config.
 	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}

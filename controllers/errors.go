@@ -33,10 +33,10 @@ type InvalidAWSRegion struct {
 }
 
 func (i *InvalidAWSRegion) Error() string {
-	return "Provider option 'region' not informed or invalid."
+	return "AWS Provider option 'region' not informed or invalid."
 }
 
-// InvalidAWSRegion error
+// InvalidGoogleCloudProject error
 type InvalidGoogleCloudProject struct {
 }
 
@@ -50,4 +50,37 @@ type InvalidSecretOption struct {
 
 func (i *InvalidSecretOption) Error() string {
 	return "Provider option 'secret' not informed or invalid."
+}
+
+// InvalidIBMSecretManagerID error
+type InvalidIBMSecretManagerID struct {
+}
+
+func (i *InvalidIBMSecretManagerID) Error() string {
+	return "IBM Provider option 'secretManagerInstanceId' not informed or invalid."
+}
+
+// InvalidIBMRegion error
+type InvalidIBMRegion struct {
+}
+
+func (i *InvalidIBMRegion) Error() string {
+	return "IBM Provider option 'region' not informed or invalid."
+}
+
+// InvalidIBMServiceApiKey error
+type InvalidIBMServiceApiKey struct {
+}
+
+func (i *InvalidIBMServiceApiKey) Error() string {
+	return "IBM environment variable [ IBM_SERVICE_API_KEY ] was not defined or invalid."
+}
+
+// InvalidUUIDFormat error
+type InvalidUUIDFormat struct {
+	fieldName string
+}
+
+func (i *InvalidUUIDFormat) Error() string {
+	return fmt.Sprintf("[ %s ] has invalid UUID format", i.fieldName)
 }
