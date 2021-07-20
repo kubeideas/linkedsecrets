@@ -10,14 +10,14 @@ if [ $# -ne 1 ]
    exit 1
 fi
 
-## AWS  crecentials
+## IBM  crecentials
 IBM_SERVICE_API_KEY=$1
 
 
 ## Creating namespace ##
 kubectl create namespace linkedsecrets-system
 
-## Creating secret for aws credentials ##
+## Creating secret for ibm credentials ##
 kubectl create secret generic ibm-credentials \
 --from-literal=IBM_SERVICE_API_KEY=$IBM_SERVICE_API_KEY \
 --namespace  linkedsecrets-system
