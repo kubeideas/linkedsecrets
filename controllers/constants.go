@@ -15,6 +15,7 @@ const (
 	GOOGLE = "Google"
 	AWS    = "AWS"
 	AZURE  = "Azure"
+	IBM    = "IBM"
 )
 
 // Provider data format

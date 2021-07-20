@@ -48,6 +48,7 @@ func parsePlainData(data []byte) (map[string][]byte, error) {
 
 // parse json format
 func parseJSON(data []byte) (map[string][]byte, error) {
+
 	// key/value map
 	result := make(map[string][]byte)
 

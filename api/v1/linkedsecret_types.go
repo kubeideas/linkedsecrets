@@ -23,9 +23,9 @@ import (
 
 // LinkedSecretSpec defines the desired state of LinkedSecret
 type LinkedSecretSpec struct {
-	// +kubebuilder:validation:Enum={"Google","AWS","Azure"}
+	// +kubebuilder:validation:Enum={"Google","AWS","Azure","IBM"}
 	// +kubebuilder:validation:Required
-	// Supported cloud secret manager. Valid options: Google,AWS,Azure.
+	// Supported cloud secret manager. Valid options: Google,AWS,Azure,IBM.
 	Provider string `json:"provider"`
 
 	// +kubebuilder:validation:Enum={"PLAIN", "JSON"}
@@ -42,6 +42,7 @@ type LinkedSecretSpec struct {
 	// Example GCP: project: <PROJECT-ID>, secret: <GCP-SECRET-NAME>, version: <latest|"1"|"2"|...>.
 	// Example AWS: region: <AWS-REGION>, secret: <AWS-SECRET-NAME>, version: <AWSPREVIOUS|AWSCURRENT>.
 	// Example Azure: keyvault: <KEYVAULT-NAME>, secret: <AZURE-SECRET-NAME>, version: <AZURE-SECRET-VERSION-ID>.
+	// Example IBM: secretManagerInstanceId: <SECRET-MANAGER-INSTANCE-UUID> , secretId: <IBM-SECRET-UUID>, region: <IBM-REGION>
 	ProviderOptions map[string]string `json:"providerOptions,omitempty"`
 
 	// +kubebuilder:validation:Type=string

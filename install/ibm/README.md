@@ -1,12 +1,12 @@
 # Linkedsecrets installation
 
-## Requirements
+Before installing Linkedsecrets operator it is necessary to create a `Service Api Key` with the following details:
 
-* **AWS_ACCESS_KEY_ID** and **AWS_SECRET_ACCESS_KEY** with permissions to read secrets on AWS Secret manager.
+* Role `SecretsReader`.
 
 **[IMPORTANT]** Avoid security issues and grant access only to secrets strictly relevant to your Kubernetes cluster project.
 
-## Namespace and AWS credentials secret
+## Namespace and GCP credentials secret
 
 ```bash
 ./create_secret.sh
@@ -15,7 +15,7 @@
 ## CRD's and controller
 
 ```bash
-kubectl apply -f install-linkedsecret-aws.yaml
+kubectl apply -f install-linkedsecret-ibm.yaml
 ```
 
 ## Verifying installation
@@ -36,17 +36,19 @@ kubectl explain linkedsecret.spec
 kubectl explain linkedsecret.status
 ```
 
-## AWS Secrets Manager data format
+## IBM Secret type
 
-Linkedsecret support `"PLAIN"` format and `"JSON"` format.
+Linkedsecrets support `"Arbitrary Secrets"` only.
+
+## IBM Secret data format
+
+Linkedsecrets support `"PLAIN"` and `"JSON"` formats.
 
 ### PLAIN format
 
-This format must use "=" to separate key/value. White spaces and white lines are allowed and will be skipped during payload parse. AWS console stores secrets data only in the **JSON** format and  you will have to use AWS CLI to store secret as binary to use **PLAIN** format.
+This format must use "=" to separate key/value. White spaces and white lines are allowed and will be skipped during payload parse.
 
 Example:
-
-Create file `[mysecret.txt]` with PLAIN text:
 
 ```bash
 username = admin
@@ -55,19 +57,11 @@ password=teste123
 host = myhost01
 ```
 
-Create AWS secret with encoded file `[mysecret.txt]` using AWS CLI:
-
-```bash
-aws secretsmanager create-secret --name mysecret --secret-binary fileb://mysecret.txt
-```
-
 ### JSON format
 
-JSON secret creation can be done in AWS Console or using AWS CLI.
+This format support a simple key/value JSON.
 
-AWS CLI example:
-
-Create file `[mysecret.txt]` with json text:
+Example:
 
 ```bash
 {
@@ -77,15 +71,9 @@ Create file `[mysecret.txt]` with json text:
 }
 ```
 
-Create AWS secret with encoded file `[mysecret.txt]` using AWS CLI:
-
-```bash
-aws secretsmanager create-secret --name mysecret --secret-binary fileb://mysecret.txt
-```
-
 ## Linkedsecrets Spec Fields
 
-Follow bellow all spec fields supported by Linkedsecrets when using AWS Secrets Manager:
+Follow bellow all spec fields supported by Linkedsecrets when using IBM Secret Manager:
 
 ``` yaml
 apiVersion: security.kubeideas.io/v1
@@ -95,18 +83,16 @@ metadata:
 spec:
   deployment: <DEPLOYMENT-NAME>
   keepSecretOnDelete: <true | false>
-  provider: AWS
+  provider: IBM
   providerDataFormat: <JSON | PLAIN>
   providerOptions:
-    secret: <AWS-SECRET-NAME>
-    region: <AWS-SECRET-RESOURCE-REGION>
-    version: <AWSCURRENT | AWSPREVIOUS> 
+    secretManagerInstanceId: <SECRET-MANAGER-INSTANCE-UUID>
+    secretId: <SECRET-UUID>
+    region: <SECRET-MANAGER-REGION>
   secretName: <SECRET-NAME-CREATED-AND-MAINTAINED-BY-LINKEDSECRETS-ON-KUBERNETES>
   schedule: <"@every 10m" | ANY-OTHER-SYNCHRONIZATION-INTERVAL>
   suspended: <true | false>
 ```
-
-**[IMPORTANT]** Secret latest version will be used if field version is omitted.
 
 ### Deployment Field
 
@@ -145,10 +131,11 @@ Pre-defined cron expressions and Classic cron expressions are accepted.
 | "*/20 * * * * *" | Run every 20 seconds                 |
 | "0 */5 * * * *"  | Run every 5 minutes                  |
 | "0 0 * * * *"    | Run once an hour, beginning of hour  |
+| "0 0 * * * *"    | Run once an hour, beginning of hour  |
 | "0 0 0 * * *"    | Run once a day, midnight             |
 |                  |                                      |
 
-**[IMPORTANT]** Have in mind that AWS cloud will charge you on each secret created and access operations. Having said that, tune the schedule accordingly.
+**[IMPORTANT]** Have in mind that IBM cloud will charge you on each secret created and access operations. Having said that, tune the schedule accordingly.
 
 ### Suspended Field
 
@@ -156,4 +143,5 @@ Use this field any time you need to stop data synchronizatin between Kubernetes 
 
 ## References
 
-[AWS Secret Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/getting-started.html)
+[IBM Secret Manager](https://cloud.ibm.com/docs/secrets-manager?topic=secrets-manager-getting-started)
+[IBM Secret Manager API](https://cloud.ibm.com/apidocs/secrets-manager?code=go#create-secret)
