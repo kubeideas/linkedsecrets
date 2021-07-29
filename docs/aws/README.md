@@ -2,7 +2,7 @@
 
 ## AWS Secrets Manager data format
 
-Linkedsecret support `"PLAIN"` format and `"JSON"` format.
+Linkedsecrets support `"PLAIN"` format and `"JSON"` format.
 
 ### PLAIN format
 
@@ -79,3 +79,4 @@ Click [HERE](https://kubeideas.github.io/linkedsecrets/aws/examples.zip) and get
 ## References
 
 [AWS Secret Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/getting-started.html)
+

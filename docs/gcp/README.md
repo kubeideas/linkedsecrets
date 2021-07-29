@@ -2,7 +2,7 @@
 
 ## Google Secret Manager data format
 
-Linkedsecret support `"PLAIN"` format and `"JSON"` format.
+Linkedsecrets support `"PLAIN"` format and `"JSON"` format.
 
 ### PLAIN format
 
