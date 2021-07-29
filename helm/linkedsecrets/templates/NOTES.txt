@@ -1,0 +1,3 @@
+Linkedsecrets pods
+
+kubectl --namespace {{ .Release.Namespace }} get pod

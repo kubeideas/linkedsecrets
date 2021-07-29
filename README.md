@@ -23,4 +23,4 @@ Supported Cloud secret solutions:
 
 ## Installation
 
-Go to [Releases](https://github.com/kubeideas/linkedsecrets/releases) and download install package with instructions and examples.
+Click [Here](https://kubeideas.github.io/linkedsecrets/) for details and examples.

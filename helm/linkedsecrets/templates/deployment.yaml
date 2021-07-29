@@ -1,0 +1,108 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    control-plane: controller-manager
+  name: linkedsecrets-controller-manager
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      control-plane: controller-manager
+  template:
+    metadata:
+      labels:
+        control-plane: controller-manager
+    spec:
+      containers:
+      - args:
+        - --secure-listen-address=0.0.0.0:8443
+        - --upstream=http://127.0.0.1:8080/
+        - --logtostderr=true
+        - --v=10
+        image: "{{ .Values.image.proxy.repository }}:{{ .Values.image.proxy.tag }}"
+        name: kube-rbac-proxy
+        ports:
+        - containerPort: 8443
+          name: https
+      - args:
+        - --health-probe-bind-address=:8081
+        - --metrics-bind-address=127.0.0.1:8080
+        - --leader-elect
+        command:
+        - /manager
+        env:
+        {{- if .Values.gcp.enabled }}
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /secret/gcp-credentials.json
+        {{- end }}
+        {{- if .Values.aws.enabled }}
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              key: AWS_ACCESS_KEY_ID
+              name: aws-credentials
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              key: AWS_SECRET_ACCESS_KEY
+              name: aws-credentials   
+        {{- end }}     
+        {{- if .Values.azure.enabled }}
+        - name: AZURE_TENANT_ID
+          valueFrom:
+            secretKeyRef:
+              key: AZURE_TENANT_ID
+              name: azure-credentials
+        - name: AZURE_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              key: AZURE_CLIENT_ID
+              name: azure-credentials
+        - name: AZURE_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: AZURE_CLIENT_SECRET
+              name: azure-credentials
+        {{- end }}
+        {{- if .Values.ibm.enabled }}
+        - name: IBM_SERVICE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: IBM_SERVICE_API_KEY
+              name: ibm-credentials
+        {{- end }}
+        image: "{{ .Values.image.manager.repository }}:{{ .Values.image.manager.tag }}"
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8081
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        name: manager
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}          
+        securityContext:
+          allowPrivilegeEscalation: false
+        {{- if .Values.gcp.enabled }}
+        volumeMounts:
+        - mountPath: /secret
+          name: gcp-credentials
+        {{- end }}
+      securityContext:
+        runAsNonRoot: true
+      serviceAccountName: linkedsecrets-controller-manager
+      terminationGracePeriodSeconds: 10
+      {{- if .Values.gcp.enabled }}     
+      volumes:
+      - name: gcp-credentials
+        secret:
+          defaultMode: 420
+          secretName: gcp-credentials
+      {{- end }}
