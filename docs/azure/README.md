@@ -97,7 +97,7 @@ spec:
 
 ## Examples
 
-Click [HERE](https://kubeideas.github.io/linkedsecrets/azure/examples.zip) and get them.
+Click [HERE](https://kubeideas.github.io/linkedsecrets/examples.zip) and get them.
 
 ## References
 
