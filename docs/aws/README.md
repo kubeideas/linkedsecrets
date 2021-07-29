@@ -79,4 +79,3 @@ Click [HERE](https://kubeideas.github.io/linkedsecrets/aws/examples.zip) and get
 ## References
 
 [AWS Secret Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/getting-started.html)
-
