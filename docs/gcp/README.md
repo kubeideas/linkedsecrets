@@ -58,7 +58,7 @@ spec:
 
 ## Examples
 
-Click [HERE](https://kubeideas.github.io/linkedsecrets/examples.zip) and get them.
+Click [Here](https://kubeideas.github.io/linkedsecrets/examples.zip) and get them.
 
 ## References
 
