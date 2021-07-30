@@ -94,7 +94,7 @@ linkedsecrets \
 kubeideas/linkedsecrets
 ```
 
-## Enable mixed Cloud Secrets solution Access
+## Enable Mixed Cloud Secrets Solution Access
 
 This example bellow enable Google Secret Manager and AWS Secrets Manager access, but any combination is allowed.
 
