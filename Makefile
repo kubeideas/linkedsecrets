@@ -79,31 +79,13 @@ uninstall: manifests kustomize ## Uninstall CRDs from the K8s cluster specified 
 	$(KUSTOMIZE) build config/crd | kubectl delete -f -
 
 ## BEGIN MY CUSTOMIZATIONS
+
 docker-build-no-test: ## Build docker image with the manager.
 	docker build -t ${IMG} .
 
-# Generate GCP manifests 
-gen-gcp: manifests
-	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
-	$(KUSTOMIZE) build config/gcp > install/gcp/install-linkedsecret-gcp.yaml	
-
-# Generate AWS manifests 
-gen-aws: manifests
-	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
-	$(KUSTOMIZE) build config/aws > install/aws/install-linkedsecret-aws.yaml	
-
-# Generate Azure manifests 
-gen-azure: manifests
-	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
-	$(KUSTOMIZE) build config/azure > install/azure/install-linkedsecret-azure.yaml		
-
-# Generate IBM manifests 
-gen-ibm: manifests
-	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
-	$(KUSTOMIZE) build config/ibm > install/ibm/install-linkedsecret-ibm.yaml	
-
-# Generate all manifests
-gen-all: gen-gcp gen-aws gen-azure gen-ibm
+export MY_PROJECT_DIR=$(shell pwd)
+helm-repo: 
+	${MY_PROJECT_DIR}/helm/update_repo.sh;
 
 ## END MY CUSTOMIZATIONS
 
