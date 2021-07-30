@@ -4,7 +4,7 @@
 
 Linkedsecrets support `"Arbitrary Secrets"` only.
 
-This kind of secret support ratation but not versioning.
+This kind of secret support rotation but not versioning.
 
 ## IBM Secret data format
 
