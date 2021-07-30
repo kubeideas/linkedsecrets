@@ -4,6 +4,8 @@
 
 Linkedsecrets support `"Arbitrary Secrets"` only.
 
+This kind of secret support ratation but not versioning.
+
 ## IBM Secret data format
 
 Linkedsecrets support `"PLAIN"` and `"JSON"` formats.
