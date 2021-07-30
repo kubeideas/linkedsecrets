@@ -1,4 +1,5 @@
-check Linkedsecrets pods
+
+Check Linkedsecrets pods:
 
 kubectl --namespace {{ .Release.Namespace }} get pod
 

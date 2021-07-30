@@ -21,6 +21,7 @@ spec:
         - --logtostderr=true
         - --v=10
         image: "{{ .Values.image.proxy.repository }}:{{ .Values.image.proxy.tag }}"
+        imagePullPolicy: {{ .Values.image.proxy.pullPolicy }}
         name: kube-rbac-proxy
         ports:
         - containerPort: 8443
@@ -73,6 +74,7 @@ spec:
               name: ibm-credentials
         {{- end }}
         image: "{{ .Values.image.manager.repository }}:{{ .Values.image.manager.tag }}"
+        imagePullPolicy: {{ .Values.image.manager.pullPolicy }}
         livenessProbe:
           httpGet:
             path: /healthz
