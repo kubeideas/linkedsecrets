@@ -1,0 +1,44 @@
+# Default values for linkedsecrets.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  proxy:
+    repository: gcr.io/kubebuilder/kube-rbac-proxy
+    pullPolicy: IfNotPresent
+    tag: "v0.8.0"
+  manager:
+    repository: kubeideas/linkedsecrets
+    pullPolicy: IfNotPresent
+    tag: "v0.7.0"
+
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 100Mi
+  requests:
+    cpu: 50m
+    memory: 50Mi
+
+## Cloud Credentials 
+gcp:
+  enabled: false
+  credentialFile: ""
+
+aws:
+  enabled: false
+  awsAccessKeyId: ""
+  awsSecretAccessKey: ""
+
+azure:
+  enabled: false 
+  azureTenantId: ""
+  azureClientId: ""
+  azureClientSecret: ""
+
+ibm:
+  enabled: false
+  ibmServiceApiKey: ""
