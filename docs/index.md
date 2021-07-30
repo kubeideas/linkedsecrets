@@ -215,7 +215,7 @@ kubectl patch lns <NAME> --type='json' -p='[{"op": "replace", "path": "/spec/kee
 ```
 
 ``` bash
-Kubectl delete lns --all-namespaces
+kubectl delete lns --all --all-namespaces
 ```
 
 ### **Remove helm chart**
