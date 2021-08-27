@@ -11,7 +11,7 @@ require (
 	github.com/Azure/go-autorest/autorest/validation v0.3.1 // indirect
 	github.com/IBM/go-sdk-core/v5 v5.5.1
 	github.com/IBM/secrets-manager-go-sdk v1.0.23
-	github.com/aws/aws-sdk-go v1.40.3
+	github.com/aws/aws-sdk-go v1.40.31
 	github.com/go-logr/logr v0.3.0
 	github.com/onsi/ginkgo v1.16.4
 	github.com/onsi/gomega v1.14.0

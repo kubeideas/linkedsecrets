@@ -29,7 +29,7 @@ var _ = Describe("Linkedsecret controller AWS", func() {
 			spec: securityv1.LinkedSecretSpec{
 				Provider:           "AWS",
 				ProviderDataFormat: "JSON",
-				ProviderOptions:    map[string]string{"secret": "secret-json-tst", "region": "us-east-1", "version": "AWSCURRENT"},
+				ProviderOptions:    map[string]string{"secret": "opaque-secret-json", "region": "us-east-1", "version": "AWSCURRENT"},
 				SecretName:         "mysecret-aws-example1",
 				Schedule:           "@every 1s",
 				Suspended:          false,
@@ -42,7 +42,7 @@ var _ = Describe("Linkedsecret controller AWS", func() {
 			spec: securityv1.LinkedSecretSpec{
 				Provider:           "AWS",
 				ProviderDataFormat: "PLAIN",
-				ProviderOptions:    map[string]string{"secret": "secret-plain-tst", "region": "us-east-1", "version": "AWSCURRENT"},
+				ProviderOptions:    map[string]string{"secret": "opaque-secret-plain", "region": "us-east-1", "version": "AWSCURRENT"},
 				SecretName:         "mysecret-aws-example2",
 				Schedule:           "@every 1s",
 				Suspended:          false,
@@ -75,7 +75,7 @@ var _ = Describe("Linkedsecret controller AWS", func() {
 				// Check expected spec
 				Expect(createdLinkedSecret.Spec.Provider).Should(Equal("AWS"))
 				Expect(createdLinkedSecret.Spec.ProviderDataFormat).Should(Equal("JSON"))
-				Expect(createdLinkedSecret.Spec.ProviderOptions["secret"]).Should(Equal("secret-json-tst"))
+				Expect(createdLinkedSecret.Spec.ProviderOptions["secret"]).Should(Equal("opaque-secret-json"))
 				Expect(createdLinkedSecret.Spec.ProviderOptions["region"]).Should(Equal("us-east-1"))
 				Expect(createdLinkedSecret.Spec.ProviderOptions["version"]).Should(Equal("AWSCURRENT"))
 				Expect(createdLinkedSecret.Spec.SecretName).Should(Equal("mysecret-aws-example1"))
@@ -102,7 +102,7 @@ var _ = Describe("Linkedsecret controller AWS", func() {
 				Expect(createdLinkedSecret.Status.CronJobStatus).Should(Equal("Scheduled"))
 				Expect(createdLinkedSecret.Status.CurrentProvider).Should(Equal("AWS"))
 				Expect(createdLinkedSecret.Status.CurrentSchedule).Should(Equal("@every 1s"))
-				Expect(createdLinkedSecret.Status.CurrentProviderOptions["secret"]).Should(Equal("secret-json-tst"))
+				Expect(createdLinkedSecret.Status.CurrentProviderOptions["secret"]).Should(Equal("opaque-secret-json"))
 				Expect(createdLinkedSecret.Status.CurrentProviderOptions["region"]).Should(Equal("us-east-1"))
 				Expect(createdLinkedSecret.Status.CurrentProviderOptions["version"]).Should(Equal("AWSCURRENT"))
 
@@ -135,7 +135,7 @@ var _ = Describe("Linkedsecret controller AWS", func() {
 				// Check expected spec
 				Expect(createdLinkedSecret.Spec.Provider).Should(Equal("AWS"))
 				Expect(createdLinkedSecret.Spec.ProviderDataFormat).Should(Equal("PLAIN"))
-				Expect(createdLinkedSecret.Spec.ProviderOptions["secret"]).Should(Equal("secret-plain-tst"))
+				Expect(createdLinkedSecret.Spec.ProviderOptions["secret"]).Should(Equal("opaque-secret-plain"))
 				Expect(createdLinkedSecret.Spec.ProviderOptions["region"]).Should(Equal("us-east-1"))
 				Expect(createdLinkedSecret.Spec.ProviderOptions["version"]).Should(Equal("AWSCURRENT"))
 				Expect(createdLinkedSecret.Spec.SecretName).Should(Equal("mysecret-aws-example2"))
@@ -162,7 +162,7 @@ var _ = Describe("Linkedsecret controller AWS", func() {
 				Expect(createdLinkedSecret.Status.CronJobStatus).Should(Equal("Scheduled"))
 				Expect(createdLinkedSecret.Status.CurrentProvider).Should(Equal("AWS"))
 				Expect(createdLinkedSecret.Status.CurrentSchedule).Should(Equal("@every 1s"))
-				Expect(createdLinkedSecret.Status.CurrentProviderOptions["secret"]).Should(Equal("secret-plain-tst"))
+				Expect(createdLinkedSecret.Status.CurrentProviderOptions["secret"]).Should(Equal("opaque-secret-plain"))
 				Expect(createdLinkedSecret.Status.CurrentProviderOptions["region"]).Should(Equal("us-east-1"))
 				Expect(createdLinkedSecret.Status.CurrentProviderOptions["version"]).Should(Equal("AWSCURRENT"))
 

@@ -21,6 +21,7 @@ var _ = Describe("Linkedsecret controller GCP", func() {
 
 	var gcpPlain LinkedSecretTest
 	var gcpJSON LinkedSecretTest
+	var gcpDockerJSON LinkedSecretTest
 	var gcpScheduleParseError LinkedSecretTest
 
 	BeforeEach(func() {
@@ -30,9 +31,9 @@ var _ = Describe("Linkedsecret controller GCP", func() {
 			spec: securityv1.LinkedSecretSpec{
 				Provider:           "Google",
 				ProviderDataFormat: "PLAIN",
-				ProviderOptions:    map[string]string{"project": "project01-306719", "secret": "secret-plain-tst", "version": "latest"},
+				ProviderOptions:    map[string]string{"project": "project01-306719", "secret": "opaque-secret-plain", "version": "latest"},
 				SecretName:         "mysecret-google-example1",
-				Schedule:           "@every 1s",
+				Schedule:           "@every 5s",
 				Suspended:          false,
 				Deployment:         "myapp",
 			},
@@ -44,9 +45,9 @@ var _ = Describe("Linkedsecret controller GCP", func() {
 			spec: securityv1.LinkedSecretSpec{
 				Provider:           "Google",
 				ProviderDataFormat: "JSON",
-				ProviderOptions:    map[string]string{"project": "project01-306719", "secret": "secret-json-tst", "version": "latest"},
+				ProviderOptions:    map[string]string{"project": "project01-306719", "secret": "opaque-secret-json", "version": "latest"},
 				SecretName:         "mysecret-google-example2",
-				Schedule:           "@every 1s",
+				Schedule:           "@every 5s",
 				Suspended:          false,
 			},
 		}
@@ -57,12 +58,26 @@ var _ = Describe("Linkedsecret controller GCP", func() {
 			spec: securityv1.LinkedSecretSpec{
 				Provider:           "Google",
 				ProviderDataFormat: "JSON",
-				ProviderOptions:    map[string]string{"project": "project01-306719", "secret": "secret-json-tst", "version": "latest"},
+				ProviderOptions:    map[string]string{"project": "project01-306719", "secret": "opaque-secret-json", "version": "latest"},
 				SecretName:         "mysecret-google-example3-schedule-parse-error",
-				Schedule:           "@every 1ss",
+				Schedule:           "@every 5ss",
 				Suspended:          false,
 			},
 		}
+
+		gcpDockerJSON = LinkedSecretTest{
+			name:      "google-docker-secret-json",
+			namespace: "default",
+			spec: securityv1.LinkedSecretSpec{
+				Provider:           "Google",
+				ProviderDataFormat: "JSON",
+				ProviderOptions:    map[string]string{"project": "project01-306719", "secret": "docker-secret-json", "version": "latest"},
+				SecretName:         "mysecret-google-docker-secret-json",
+				Schedule:           "@every 5s",
+				Suspended:          false,
+			},
+		}
+
 	})
 
 	Context("When creating new GCP PLAIN Linkedsecret", func() {
@@ -89,18 +104,18 @@ var _ = Describe("Linkedsecret controller GCP", func() {
 			}, TIMEOUT, INTERVAL).Should(BeTrue())
 
 			// Check expected spec
-			By("By checking created linkedsecret spec")
+			By("By checking created PLAIN linkedsecret spec")
 			Expect(createdLinkedSecret.Spec.Provider).Should(Equal("Google"))
 			Expect(createdLinkedSecret.Spec.ProviderDataFormat).Should(Equal("PLAIN"))
 			Expect(createdLinkedSecret.Spec.ProviderOptions["project"]).Should(Equal("project01-306719"))
-			Expect(createdLinkedSecret.Spec.ProviderOptions["secret"]).Should(Equal("secret-plain-tst"))
+			Expect(createdLinkedSecret.Spec.ProviderOptions["secret"]).Should(Equal("opaque-secret-plain"))
 			Expect(createdLinkedSecret.Spec.ProviderOptions["version"]).Should(Equal("latest"))
 			Expect(createdLinkedSecret.Spec.SecretName).Should(Equal("mysecret-google-example1"))
 			Expect(createdLinkedSecret.Spec.Suspended).Should(Equal(false))
-			Expect(createdLinkedSecret.Spec.Schedule).Should(Equal("@every 1s"))
+			Expect(createdLinkedSecret.Spec.Schedule).Should(Equal("@every 5s"))
 
 			// Expected status
-			By("By checking created linkedsecret status")
+			By("By checking created PLAIN linkedsecret status")
 			// Get linkedSecret
 			Eventually(func() bool {
 				err := k8sClient.Get(ctx, linkedSecretLookupKey, createdLinkedSecret)
@@ -118,9 +133,9 @@ var _ = Describe("Linkedsecret controller GCP", func() {
 			Expect(createdLinkedSecret.Status.CronJobID).Should(Equal(cron.EntryID(1)))
 			Expect(createdLinkedSecret.Status.CronJobStatus).Should(Equal("Scheduled"))
 			Expect(createdLinkedSecret.Status.CurrentProvider).Should(Equal("Google"))
-			Expect(createdLinkedSecret.Status.CurrentSchedule).Should(Equal("@every 1s"))
+			Expect(createdLinkedSecret.Status.CurrentSchedule).Should(Equal("@every 5s"))
 			Expect(createdLinkedSecret.Status.CurrentProviderOptions["project"]).Should(Equal("project01-306719"))
-			Expect(createdLinkedSecret.Status.CurrentProviderOptions["secret"]).Should(Equal("secret-plain-tst"))
+			Expect(createdLinkedSecret.Status.CurrentProviderOptions["secret"]).Should(Equal("opaque-secret-plain"))
 			Expect(createdLinkedSecret.Status.CurrentProviderOptions["version"]).Should(Equal("latest"))
 
 		})
@@ -165,11 +180,11 @@ var _ = Describe("Linkedsecret controller GCP", func() {
 			Expect(updatedLinkedSecret.Spec.Provider).Should(Equal("Google"))
 			Expect(updatedLinkedSecret.Spec.ProviderDataFormat).Should(Equal("PLAIN"))
 			Expect(updatedLinkedSecret.Spec.ProviderOptions["project"]).Should(Equal("project01-306719"))
-			Expect(updatedLinkedSecret.Spec.ProviderOptions["secret"]).Should(Equal("secret-plain-tst"))
+			Expect(updatedLinkedSecret.Spec.ProviderOptions["secret"]).Should(Equal("opaque-secret-plain"))
 			Expect(updatedLinkedSecret.Spec.ProviderOptions["version"]).Should(Equal("latest"))
 			Expect(updatedLinkedSecret.Spec.SecretName).Should(Equal("mysecret-google-example1"))
 			Expect(updatedLinkedSecret.Spec.Suspended).Should(Equal(true))
-			Expect(updatedLinkedSecret.Spec.Schedule).Should(Equal("@every 1s"))
+			Expect(updatedLinkedSecret.Spec.Schedule).Should(Equal("@every 5s"))
 
 			By("By checking updated linkedsecret status")
 			// Get linkedSecret
@@ -191,9 +206,9 @@ var _ = Describe("Linkedsecret controller GCP", func() {
 			Expect(updatedLinkedSecret.Status.CronJobID).Should(Equal(cron.EntryID(-1)))
 			Expect(updatedLinkedSecret.Status.CronJobStatus).Should(Equal(JOBSUSPENDED))
 			Expect(updatedLinkedSecret.Status.CurrentProvider).Should(Equal("Google"))
-			Expect(updatedLinkedSecret.Status.CurrentSchedule).Should(Equal("@every 1s"))
+			Expect(updatedLinkedSecret.Status.CurrentSchedule).Should(Equal("@every 5s"))
 			Expect(updatedLinkedSecret.Status.CurrentProviderOptions["project"]).Should(Equal("project01-306719"))
-			Expect(updatedLinkedSecret.Status.CurrentProviderOptions["secret"]).Should(Equal("secret-plain-tst"))
+			Expect(updatedLinkedSecret.Status.CurrentProviderOptions["secret"]).Should(Equal("opaque-secret-plain"))
 			Expect(updatedLinkedSecret.Status.CurrentProviderOptions["version"]).Should(Equal("latest"))
 
 		})
@@ -203,7 +218,7 @@ var _ = Describe("Linkedsecret controller GCP", func() {
 	Context("When creating new GCP JSON Linkedsecret", func() {
 		It("Should create GCP JSON Linkedsecret", func() {
 
-			By("By creating new GCP linkedsecret")
+			By("By creating new GCP JSON linkedsecret")
 			ctx := context.Background()
 			linkedSecret := &securityv1.LinkedSecret{
 				TypeMeta:   v1.TypeMeta{Kind: "LinkedSecret", APIVersion: "linkedsecrets/api/v1"},
@@ -216,7 +231,7 @@ var _ = Describe("Linkedsecret controller GCP", func() {
 			linkedSecretLookupKey := types.NamespacedName{Namespace: gcpJSON.namespace, Name: gcpJSON.name}
 			createdLinkedSecret := &securityv1.LinkedSecret{}
 
-			By("By checking created linkedsecret spec")
+			By("By checking created JSON linkedsecret spec")
 			// Get linkedSecret
 			Eventually(func() bool {
 				err := k8sClient.Get(ctx, linkedSecretLookupKey, createdLinkedSecret)
@@ -227,11 +242,11 @@ var _ = Describe("Linkedsecret controller GCP", func() {
 			Expect(createdLinkedSecret.Spec.Provider).Should(Equal("Google"))
 			Expect(createdLinkedSecret.Spec.ProviderDataFormat).Should(Equal("JSON"))
 			Expect(createdLinkedSecret.Spec.ProviderOptions["project"]).Should(Equal("project01-306719"))
-			Expect(createdLinkedSecret.Spec.ProviderOptions["secret"]).Should(Equal("secret-json-tst"))
+			Expect(createdLinkedSecret.Spec.ProviderOptions["secret"]).Should(Equal("opaque-secret-json"))
 			Expect(createdLinkedSecret.Spec.ProviderOptions["version"]).Should(Equal("latest"))
 			Expect(createdLinkedSecret.Spec.SecretName).Should(Equal("mysecret-google-example2"))
 			Expect(createdLinkedSecret.Spec.Suspended).Should(Equal(false))
-			Expect(createdLinkedSecret.Spec.Schedule).Should(Equal("@every 1s"))
+			Expect(createdLinkedSecret.Spec.Schedule).Should(Equal("@every 5s"))
 
 			By("By checking linkedsecret status")
 			// Get linkedSecret
@@ -251,9 +266,9 @@ var _ = Describe("Linkedsecret controller GCP", func() {
 			Expect(createdLinkedSecret.Status.CronJobID).Should(Equal(cron.EntryID(1)))
 			Expect(createdLinkedSecret.Status.CronJobStatus).Should(Equal("Scheduled"))
 			Expect(createdLinkedSecret.Status.CurrentProvider).Should(Equal("Google"))
-			Expect(createdLinkedSecret.Status.CurrentSchedule).Should(Equal("@every 1s"))
+			Expect(createdLinkedSecret.Status.CurrentSchedule).Should(Equal("@every 5s"))
 			Expect(createdLinkedSecret.Status.CurrentProviderOptions["project"]).Should(Equal("project01-306719"))
-			Expect(createdLinkedSecret.Status.CurrentProviderOptions["secret"]).Should(Equal("secret-json-tst"))
+			Expect(createdLinkedSecret.Status.CurrentProviderOptions["secret"]).Should(Equal("opaque-secret-json"))
 			Expect(createdLinkedSecret.Status.CurrentProviderOptions["version"]).Should(Equal("latest"))
 
 		})
@@ -322,12 +337,144 @@ var _ = Describe("Linkedsecret controller GCP", func() {
 			Expect(createdLinkedSecretWithScheduleParseError.Status.CronJobID).Should(Equal(cron.EntryID(-1)))
 			Expect(createdLinkedSecretWithScheduleParseError.Status.CronJobStatus).Should(Equal(JOBFAILPARSESCHEDULE))
 			Expect(createdLinkedSecretWithScheduleParseError.Status.CurrentProvider).Should(Equal("Google"))
-			Expect(createdLinkedSecretWithScheduleParseError.Status.CurrentSchedule).Should(Equal("@every 1ss"))
+			Expect(createdLinkedSecretWithScheduleParseError.Status.CurrentSchedule).Should(Equal("@every 5ss"))
 			Expect(createdLinkedSecretWithScheduleParseError.Status.CurrentProviderOptions["project"]).Should(Equal("project01-306719"))
-			Expect(createdLinkedSecretWithScheduleParseError.Status.CurrentProviderOptions["secret"]).Should(Equal("secret-json-tst"))
+			Expect(createdLinkedSecretWithScheduleParseError.Status.CurrentProviderOptions["secret"]).Should(Equal("opaque-secret-json"))
 			Expect(createdLinkedSecretWithScheduleParseError.Status.CurrentProviderOptions["version"]).Should(Equal("latest"))
 
 		})
 	})
 
+	Context("When updating GCP PLAIN Linkedsecret ", func() {
+		It("Should suspend GCP PLAIN Linkedsecret", func() {
+
+			By("Getting GCP PLAIN linkedsecret with GCP PLAIN Secret")
+			ctx := context.Background()
+			linkedSecretLookupKey := types.NamespacedName{Namespace: gcpPlain.namespace, Name: gcpPlain.name}
+			linkedSecret := &securityv1.LinkedSecret{}
+
+			// Get linkedSecret
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, linkedSecretLookupKey, linkedSecret)
+				return err == nil
+			}, TIMEOUT, INTERVAL).Should(BeTrue())
+
+			By("Changing spec field 'suspended' to true")
+			linkedSecret.Spec.Suspended = true
+
+			// Create new LinkeSecret
+			Expect(k8sClient.Update(ctx, linkedSecret)).Should(Succeed())
+
+			updatedLinkedSecret := &securityv1.LinkedSecret{}
+
+			By("By checking updated linkedsecret spec")
+			// Get linkedSecret
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, linkedSecretLookupKey, updatedLinkedSecret)
+				if err != nil {
+					return false
+				}
+				if !updatedLinkedSecret.Spec.Suspended {
+					return false
+				}
+				return true
+			}, TIMEOUT, INTERVAL).Should(BeTrue())
+
+			// Check expected spec
+			Expect(updatedLinkedSecret.Spec.Provider).Should(Equal("Google"))
+			Expect(updatedLinkedSecret.Spec.ProviderDataFormat).Should(Equal("PLAIN"))
+			Expect(updatedLinkedSecret.Spec.ProviderOptions["project"]).Should(Equal("project01-306719"))
+			Expect(updatedLinkedSecret.Spec.ProviderOptions["secret"]).Should(Equal("opaque-secret-plain"))
+			Expect(updatedLinkedSecret.Spec.ProviderOptions["version"]).Should(Equal("latest"))
+			Expect(updatedLinkedSecret.Spec.SecretName).Should(Equal("mysecret-google-example1"))
+			Expect(updatedLinkedSecret.Spec.Suspended).Should(Equal(true))
+			Expect(updatedLinkedSecret.Spec.Schedule).Should(Equal("@every 5s"))
+
+			By("By checking updated linkedsecret status")
+			// Get linkedSecret
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, linkedSecretLookupKey, updatedLinkedSecret)
+				if err != nil {
+					return false
+				}
+				if updatedLinkedSecret.Status.CronJobStatus != JOBSUSPENDED {
+					return false
+				}
+				if updatedLinkedSecret.Status.CronJobID != cron.EntryID(-1) {
+					return false
+				}
+				return true
+			}, TIMEOUT, INTERVAL).Should(BeTrue())
+			// Check expected status
+			Expect(updatedLinkedSecret.Status.CreatedSecret).Should(Equal("mysecret-google-example1"))
+			Expect(updatedLinkedSecret.Status.CronJobID).Should(Equal(cron.EntryID(-1)))
+			Expect(updatedLinkedSecret.Status.CronJobStatus).Should(Equal(JOBSUSPENDED))
+			Expect(updatedLinkedSecret.Status.CurrentProvider).Should(Equal("Google"))
+			Expect(updatedLinkedSecret.Status.CurrentSchedule).Should(Equal("@every 5s"))
+			Expect(updatedLinkedSecret.Status.CurrentProviderOptions["project"]).Should(Equal("project01-306719"))
+			Expect(updatedLinkedSecret.Status.CurrentProviderOptions["secret"]).Should(Equal("opaque-secret-plain"))
+			Expect(updatedLinkedSecret.Status.CurrentProviderOptions["version"]).Should(Equal("latest"))
+
+		})
+
+	})
+
+	Context("When creating Docker config JSON Linkedsecret", func() {
+		It("Should create Docker config JSON Linkedsecret", func() {
+
+			By("By creating new Docker config JSON Linkedsecret")
+			ctx := context.Background()
+			linkedSecret := &securityv1.LinkedSecret{
+				TypeMeta:   v1.TypeMeta{Kind: "LinkedSecret", APIVersion: "linkedsecrets/api/v1"},
+				ObjectMeta: v1.ObjectMeta{Name: gcpDockerJSON.name, Namespace: gcpDockerJSON.namespace},
+				Spec:       gcpDockerJSON.spec,
+			}
+			// Create new LinkeSecret
+			Expect(k8sClient.Create(ctx, linkedSecret)).Should(Succeed())
+
+			linkedSecretLookupKey := types.NamespacedName{Namespace: gcpDockerJSON.namespace, Name: gcpDockerJSON.name}
+			createdLinkedSecret := &securityv1.LinkedSecret{}
+
+			By("By checking created Docker Config Linkedsecret spec")
+			// Get linkedSecret
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, linkedSecretLookupKey, createdLinkedSecret)
+				return err == nil
+			}, TIMEOUT, INTERVAL).Should(BeTrue())
+
+			// Check expected spec
+			Expect(createdLinkedSecret.Spec.Provider).Should(Equal("Google"))
+			Expect(createdLinkedSecret.Spec.ProviderDataFormat).Should(Equal("JSON"))
+			Expect(createdLinkedSecret.Spec.ProviderOptions["project"]).Should(Equal("project01-306719"))
+			Expect(createdLinkedSecret.Spec.ProviderOptions["secret"]).Should(Equal("docker-secret-json"))
+			Expect(createdLinkedSecret.Spec.ProviderOptions["version"]).Should(Equal("latest"))
+			Expect(createdLinkedSecret.Spec.SecretName).Should(Equal("mysecret-google-docker-secret-json"))
+			Expect(createdLinkedSecret.Spec.Suspended).Should(Equal(false))
+			Expect(createdLinkedSecret.Spec.Schedule).Should(Equal("@every 5s"))
+
+			By("By checking Docker Config Linkedsecret status")
+			// Get linkedSecret
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, linkedSecretLookupKey, createdLinkedSecret)
+				if err != nil {
+					return false
+				}
+				if createdLinkedSecret.Status.CronJobID == cron.EntryID(0) {
+					return false
+				}
+				return true
+			}, TIMEOUT, INTERVAL).Should(BeTrue())
+
+			// Check Current status
+			Expect(createdLinkedSecret.Status.CreatedSecret).Should(Equal("mysecret-google-docker-secret-json"))
+			Expect(createdLinkedSecret.Status.CronJobID).Should(Equal(cron.EntryID(1)))
+			Expect(createdLinkedSecret.Status.CronJobStatus).Should(Equal("Scheduled"))
+			Expect(createdLinkedSecret.Status.CurrentProvider).Should(Equal("Google"))
+			Expect(createdLinkedSecret.Status.CurrentSchedule).Should(Equal("@every 5s"))
+			Expect(createdLinkedSecret.Status.CurrentProviderOptions["project"]).Should(Equal("project01-306719"))
+			Expect(createdLinkedSecret.Status.CurrentProviderOptions["secret"]).Should(Equal("docker-secret-json"))
+			Expect(createdLinkedSecret.Status.CurrentProviderOptions["version"]).Should(Equal("latest"))
+
+		})
+	})
 })
