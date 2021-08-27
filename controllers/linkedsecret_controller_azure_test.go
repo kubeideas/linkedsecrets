@@ -29,7 +29,7 @@ var _ = Describe("Linkedsecret controller Azure", func() {
 			spec: securityv1.LinkedSecretSpec{
 				Provider:           "Azure",
 				ProviderDataFormat: "JSON",
-				ProviderOptions:    map[string]string{"secret": "secret-json-tst", "keyvault": "linkedsecret"},
+				ProviderOptions:    map[string]string{"secret": "opaque-secret-json", "keyvault": "linkedsecret"},
 				SecretName:         "mysecret-azure-example1",
 				Schedule:           "@every 1s",
 				Suspended:          false,
@@ -42,7 +42,7 @@ var _ = Describe("Linkedsecret controller Azure", func() {
 			spec: securityv1.LinkedSecretSpec{
 				Provider:           "Azure",
 				ProviderDataFormat: "PLAIN",
-				ProviderOptions:    map[string]string{"secret": "secret-plain-tst", "keyvault": "linkedsecret"},
+				ProviderOptions:    map[string]string{"secret": "opaque-secret-plain", "keyvault": "linkedsecret"},
 				SecretName:         "mysecret-azure-example2",
 				Schedule:           "@every 1s",
 				Suspended:          false,
@@ -75,7 +75,7 @@ var _ = Describe("Linkedsecret controller Azure", func() {
 				// Check expected spec
 				Expect(createdLinkedSecret.Spec.Provider).Should(Equal("Azure"))
 				Expect(createdLinkedSecret.Spec.ProviderDataFormat).Should(Equal("JSON"))
-				Expect(createdLinkedSecret.Spec.ProviderOptions["secret"]).Should(Equal("secret-json-tst"))
+				Expect(createdLinkedSecret.Spec.ProviderOptions["secret"]).Should(Equal("opaque-secret-json"))
 				Expect(createdLinkedSecret.Spec.ProviderOptions["keyvault"]).Should(Equal("linkedsecret"))
 				Expect(createdLinkedSecret.Spec.SecretName).Should(Equal("mysecret-azure-example1"))
 				Expect(createdLinkedSecret.Spec.Suspended).Should(Equal(false))
@@ -101,7 +101,7 @@ var _ = Describe("Linkedsecret controller Azure", func() {
 				Expect(createdLinkedSecret.Status.CronJobStatus).Should(Equal("Scheduled"))
 				Expect(createdLinkedSecret.Status.CurrentProvider).Should(Equal("Azure"))
 				Expect(createdLinkedSecret.Status.CurrentSchedule).Should(Equal("@every 1s"))
-				Expect(createdLinkedSecret.Status.CurrentProviderOptions["secret"]).Should(Equal("secret-json-tst"))
+				Expect(createdLinkedSecret.Status.CurrentProviderOptions["secret"]).Should(Equal("opaque-secret-json"))
 				Expect(createdLinkedSecret.Status.CurrentProviderOptions["keyvault"]).Should(Equal("linkedsecret"))
 
 			})
@@ -133,7 +133,7 @@ var _ = Describe("Linkedsecret controller Azure", func() {
 				// Check expected spec
 				Expect(createdLinkedSecret.Spec.Provider).Should(Equal("Azure"))
 				Expect(createdLinkedSecret.Spec.ProviderDataFormat).Should(Equal("PLAIN"))
-				Expect(createdLinkedSecret.Spec.ProviderOptions["secret"]).Should(Equal("secret-plain-tst"))
+				Expect(createdLinkedSecret.Spec.ProviderOptions["secret"]).Should(Equal("opaque-secret-plain"))
 				Expect(createdLinkedSecret.Spec.ProviderOptions["keyvault"]).Should(Equal("linkedsecret"))
 				Expect(createdLinkedSecret.Spec.SecretName).Should(Equal("mysecret-azure-example2"))
 				Expect(createdLinkedSecret.Spec.Suspended).Should(Equal(false))
@@ -159,7 +159,7 @@ var _ = Describe("Linkedsecret controller Azure", func() {
 				Expect(createdLinkedSecret.Status.CronJobStatus).Should(Equal("Scheduled"))
 				Expect(createdLinkedSecret.Status.CurrentProvider).Should(Equal("Azure"))
 				Expect(createdLinkedSecret.Status.CurrentSchedule).Should(Equal("@every 1s"))
-				Expect(createdLinkedSecret.Status.CurrentProviderOptions["secret"]).Should(Equal("secret-plain-tst"))
+				Expect(createdLinkedSecret.Status.CurrentProviderOptions["secret"]).Should(Equal("opaque-secret-plain"))
 				Expect(createdLinkedSecret.Status.CurrentProviderOptions["keyvault"]).Should(Equal("linkedsecret"))
 
 			})

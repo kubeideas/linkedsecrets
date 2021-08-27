@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	securityv1 "linkedsecrets/api/v1"
 
 	corev1 "k8s.io/api/core/v1"
@@ -9,6 +10,11 @@ import (
 
 //GetProviderSecret access provider and return filled secret object
 func (r *LinkedSecretReconciler) GetProviderSecret(linkedsecret *securityv1.LinkedSecret) (corev1.Secret, error) {
+
+	log := r.Log.WithValues("linkedsecret", fmt.Sprintf("%s/%s", linkedsecret.Namespace, linkedsecret.Name))
+
+	// Default secret type
+	var secretType corev1.SecretType = "Opaque"
 
 	var err error
 	data := []byte{}
@@ -43,6 +49,13 @@ func (r *LinkedSecretReconciler) GetProviderSecret(linkedsecret *securityv1.Link
 		return secret, err
 	}
 
+	// infer docker secret
+	if dockerSecret, ok := inferDockerConfig(secretMap); ok {
+		secretMap = dockerSecret
+		secretType = "kubernetes.io/dockerconfigjson"
+		log.V(1).Info("Docker Config inferred", "secret type", secretType)
+	}
+
 	// create new secret object and add data
 	secret = corev1.Secret{
 		TypeMeta: v1.TypeMeta{
@@ -54,7 +67,7 @@ func (r *LinkedSecretReconciler) GetProviderSecret(linkedsecret *securityv1.Link
 			Namespace: linkedsecret.Namespace,
 		},
 		Data: secretMap,
-		Type: "Opaque",
+		Type: secretType,
 	}
 
 	return secret, nil

@@ -1,10 +1,30 @@
-# Linkedsecret Installation
+# Linkedsecrets
 
 ## Requirements
 
 * Kubernetes 1.18 or newer cluster with RBAC (Role-Based Access Control) enabled is required.
 * Helm 3
 * Kubectl client installed and configured to access Kubernetes Cluster.
+
+## Kubernetes Secrets Support
+
+Linkedsecrets can create Kubernetes secrets types bellow:
+
+* Opaque
+* kubernetes.io/dockerconfigjson
+
+## Kubernetes Docker Config Secrets
+
+Docker config secrets type is auto detected by Linkedsecrets based on cloud secrets fields. If your cloud secrets has at least fields "`docker-username`" and "`docker-password`", Linkedsecrets will create a Kubernetes secrets with type "`kubernetes.io/dockerconfigjson`".
+
+Follow bellow all supported cloud secrets fields to create Kubernetes Docker config secrets:
+
+* docker-username
+* docker-password
+* docker-email
+* docker-server
+
+If "`docker-server`" field is ommited, Linkedsecrets will assign default value "`https://index.docker.io/v1/`".
 
 ## Kubeideas Helm repo
 
@@ -25,7 +45,7 @@ helm search repo kubeideas
 Before install Linkedsecrets Helm chart, install manually Linkedsecrets CRD:
 
 ``` bash
-kubectl apply -f https://github.com/kubeideas/linkedsecrets/releases/download/v0.7.0/security.kubeideas.io_linkedsecrets.yaml
+kubectl apply -f https://github.com/kubeideas/linkedsecrets/releases/download/v0.8.0/security.kubeideas.io_linkedsecrets.yaml
 ```
 
 ## Enable GCP Secret Manager Access
