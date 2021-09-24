@@ -71,7 +71,6 @@ func (r *LinkedSecretReconciler) GetAWSSecret(linkedsecret *securityv1.LinkedSec
 	//var secretString, decodedBinarySecret string
 	var data []byte
 	if result.SecretString != nil {
-		fmt.Println("SECRET-STRING = ", string(result.SecretBinary))
 		data = []byte(*result.SecretString)
 	} else {
 		// if SecretBinary base64 decoding returns any error, it will be considered not encoded.
