@@ -253,7 +253,7 @@ helm -n <LINKEDSECRETS-NAMESPACE> delete linkedsecrets
 ### **Remove Custom Resource Definitions**
 
 ``` bash
-kubectl delete -f https://github.com/kubeideas/linkedsecrets/releases/download/v0.7.0/security.kubeideas.io_linkedsecrets.yaml
+kubectl delete -f https://github.com/kubeideas/linkedsecrets/releases/download/v0.8.1/security.kubeideas.io_linkedsecrets.yaml
 ```
 
 ### **Remove Linkedsecrets namespace**
