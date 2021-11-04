@@ -17,9 +17,9 @@ var _ = Describe("Linkedsecret controller IBM", func() {
 	const (
 		TIMEOUT                 = time.Second * 60
 		INTERVAL                = time.Millisecond * 100
-		SECRETMANAGERINSTANCEID = "81f6c7a4-3661-47a4-a0f1-acbbf630fe9d"
-		JSONSECRETID            = "17b545d2-4d37-f976-3d44-6c80eab3a1b3"
-		PLANTEXTSECRETID        = "d6524ef5-8067-b6e3-72b1-29f7a0059992"
+		SECRETMANAGERINSTANCEID = "8d2350b3-7ce3-4852-8b4b-a5cc6fd5f146"
+		JSONSECRETID            = "53a1db89-ce4e-0a39-a699-4a91ca9920a5"
+		PLANTEXTSECRETID        = "5c5c4c05-31e8-7c5a-c7bd-e4d7e42d6547"
 		REGION                  = "us-east"
 	)
 

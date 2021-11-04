@@ -26,6 +26,12 @@ Follow bellow all supported cloud secrets fields to create Kubernetes Docker con
 
 If "`docker-server`" field is ommited, Linkedsecrets will assign default value "`https://index.docker.io/v1/`".
 
+## Base64 encoded data
+
+To create secrets with base64 encoded data, just encode file content and add to secrets field.
+
+Linkedsecrets will decode data and create Kubernetes secret. If data decoded results in a non UTF8 string, undecoded data will be used to create Kubernetes secret.
+
 ## Kubeideas Helm repo
 
 Configure `kubeideas` Helm repository locally:
@@ -45,7 +51,7 @@ helm search repo kubeideas
 Before install Linkedsecrets Helm chart, install manually Linkedsecrets CRD:
 
 ``` bash
-kubectl apply -f https://github.com/kubeideas/linkedsecrets/releases/download/v0.8.0/security.kubeideas.io_linkedsecrets.yaml
+kubectl apply -f https://github.com/kubeideas/linkedsecrets/releases/download/v0.8.1/security.kubeideas.io_linkedsecrets.yaml
 ```
 
 ## Enable GCP Secret Manager Access
@@ -65,7 +71,7 @@ linkedsecrets \
 kubeideas/linkedsecrets
 ```
 
-## Enable AWS Secrets manager Access
+## Enable AWS Secrets Manager Access
 
 Create AWS user with permissions to read secrets.
 

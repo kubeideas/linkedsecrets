@@ -2,8 +2,10 @@ package controllers
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"unicode/utf8"
 )
 
 // DELIMITER used to split data
@@ -27,12 +29,26 @@ func parsePlainData(data []byte) (map[string][]byte, error) {
 			// skip key without delimiter, key without value or value without key
 			if len(splitDatakv) == 2 && bytes.TrimSpace(splitDatakv[0]) != nil && bytes.TrimSpace(splitDatakv[1]) != nil {
 
-				//trim leading and trailing whitespaces
-				key := bytes.TrimSpace(splitDatakv[0])
-				value := bytes.TrimSpace(splitDatakv[1])
+				// trim leading and trailing whitespaces
+				key := string(bytes.TrimSpace(splitDatakv[0]))
+				//value := bytes.TrimSpace(splitDatakv[1])
 
-				// add to map
-				result[string(key)] = value
+				//check for base64 encoded file idenfication
+				value, err := base64.StdEncoding.DecodeString(string(bytes.TrimSpace(splitDatakv[1])))
+				if err != nil {
+					// fallback to raw data
+					value = bytes.TrimSpace(splitDatakv[1])
+				} else {
+					// Decoded value must be utf8
+					if !utf8.Valid(value) {
+						// fallback to raw data
+						value = bytes.TrimSpace(splitDatakv[1])
+					}
+				}
+
+				// add raw key and data to map
+				result[key] = value
+
 			}
 
 		}
@@ -63,8 +79,26 @@ func parseJSON(data []byte) (map[string][]byte, error) {
 	for k, v := range dat {
 		// skip key without value and value without key
 		if k != "" && v != "" {
+
 			//add to map
-			result[k] = []byte(fmt.Sprintf("%v", v))
+			//result[k] = []byte(fmt.Sprintf("%v", v))
+
+			//check for base64 encoded file content
+			value, err := base64.StdEncoding.DecodeString(fmt.Sprintf("%v", v))
+			if err != nil {
+				// fallback to raw data
+				value = []byte(fmt.Sprintf("%v", v))
+			} else {
+				// Decoded value must be utf8
+				if !utf8.Valid(value) {
+					// fallback to raw data
+					value = []byte(fmt.Sprintf("%v", v))
+				}
+			}
+
+			// add to map
+			result[k] = value
+
 		}
 	}
 
