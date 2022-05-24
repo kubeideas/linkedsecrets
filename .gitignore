@@ -27,3 +27,7 @@ testbin/*
 
 ## ignore install package
 install.zip
+
+
+## vscode
+.vscode
