@@ -3,7 +3,7 @@ package controllers
 import (
 	"context"
 	"fmt"
-	securityv1 "linkedsecrets/api/v1"
+	securityv1 "kubeideas/linkedsecrets/api/v1"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/keyvault/keyvault"

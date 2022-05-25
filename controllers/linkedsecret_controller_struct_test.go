@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	securityv1 "linkedsecrets/api/v1"
+	securityv1 "kubeideas/linkedsecrets/api/v1"
 )
 
 // encapsulate Linkedsecret name and spec

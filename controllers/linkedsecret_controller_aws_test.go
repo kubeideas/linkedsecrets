@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"context"
-	securityv1 "linkedsecrets/api/v1"
+	securityv1 "kubeideas/linkedsecrets/api/v1"
 	"time"
 
 	. "github.com/onsi/ginkgo"

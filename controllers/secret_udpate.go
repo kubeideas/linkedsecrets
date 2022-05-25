@@ -3,7 +3,7 @@ package controllers
 import (
 	"context"
 	"fmt"
-	securityv1 "linkedsecrets/api/v1"
+	securityv1 "kubeideas/linkedsecrets/api/v1"
 
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"

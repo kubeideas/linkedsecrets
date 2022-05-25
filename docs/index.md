@@ -15,7 +15,7 @@ Linkedsecrets can create Kubernetes secrets types bellow:
 
 ## Kubernetes Docker Config Secrets
 
-Docker config secrets type is auto detected by Linkedsecrets based on cloud secrets fields. If your cloud secrets has at least fields "`docker-username`" and "`docker-password`", Linkedsecrets will create a Kubernetes secrets with type "`kubernetes.io/dockerconfigjson`".
+Docker config secrets type is auto-detected by Linkedsecrets based on cloud secrets fields. If your cloud secrets have at least fields "`docker-username`" and "`docker-password`", Linkedsecrets will create a Kubernetes secrets with type "`kubernetes.io/dockerconfigjson`".
 
 Follow bellow all supported cloud secrets fields to create Kubernetes Docker config secrets:
 

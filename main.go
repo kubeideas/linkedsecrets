@@ -1,5 +1,5 @@
 /*
-Copyright 2021.
+Copyright 2022.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import (
 	_ "net/http/pprof"
 
 	"github.com/robfig/cron/v3"
-
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -38,8 +37,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	securityv1 "linkedsecrets/api/v1"
-	"linkedsecrets/controllers"
+	securityv1 "kubeideas/linkedsecrets/api/v1"
+	"kubeideas/linkedsecrets/controllers"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -56,7 +55,6 @@ func init() {
 }
 
 func main() {
-
 	var metricsAddr string
 	var enableLeaderElection bool
 	var probeAddr string
@@ -92,7 +90,7 @@ func main() {
 		Port:                   9443,
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
-		LeaderElectionID:       "dde0d8ed.kubeideas.io",
+		LeaderElectionID:       "bb51ea05.kubeideas.io",
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")

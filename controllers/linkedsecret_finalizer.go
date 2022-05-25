@@ -3,7 +3,7 @@ package controllers
 import (
 	"context"
 	"fmt"
-	securityv1 "linkedsecrets/api/v1"
+	securityv1 "kubeideas/linkedsecrets/api/v1"
 )
 
 //LINKEDSECRETFINALIZER identify linkendsecret to be intercept before delete
