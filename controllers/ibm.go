@@ -3,7 +3,7 @@ package controllers
 import (
 	"encoding/base64"
 	"fmt"
-	securityv1 "linkedsecrets/api/v1"
+	securityv1 "kubeideas/linkedsecrets/api/v1"
 	"os"
 
 	"github.com/IBM/go-sdk-core/v5/core"
