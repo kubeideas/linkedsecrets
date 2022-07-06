@@ -16,20 +16,17 @@ spec:
     spec:
       containers:
       - args:
-        - --secure-listen-address=0.0.0.0:8443
-        - --upstream=http://127.0.0.1:8080/
-        - --logtostderr=true
-        - --v=10
+        {{- toYaml .Values.flags.proxy | nindent 8 }}
         image: "{{ .Values.image.proxy.repository }}:{{ .Values.image.proxy.tag }}"
         imagePullPolicy: {{ .Values.image.proxy.pullPolicy }}
         name: kube-rbac-proxy
+        resources:
+          {{- toYaml .Values.resources.proxy | nindent 12 }}          
         ports:
         - containerPort: 8443
           name: https
       - args:
-        - --health-probe-bind-address=:8081
-        - --metrics-bind-address=127.0.0.1:8080
-        - --leader-elect=true
+        {{- toYaml .Values.flags.manager | nindent 8 }}
         command:
         - /manager
         env:
@@ -89,7 +86,7 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 10
         resources:
-          {{- toYaml .Values.resources | nindent 12 }}          
+          {{- toYaml .Values.resources.manager | nindent 12 }}          
         securityContext:
           allowPrivilegeEscalation: false
         {{- if .Values.gcp.enabled }}
