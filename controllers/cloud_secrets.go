@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"errors"
 	securityv1 "kubeideas/linkedsecrets/api/v1"
 
 	corev1 "k8s.io/api/core/v1"
@@ -23,53 +22,16 @@ func (r *LinkedSecretReconciler) GetCloudSecret(ctx context.Context, linkedsecre
 	secret := corev1.Secret{}
 	var secretMap map[string][]byte
 
-	// Fake test
-	fakeData := func(linkedsecret *securityv1.LinkedSecret) ([]byte, error) {
-
-		secretJSON := `{"user": "user01","password": "pwd12345"}`
-		secretPlain := []byte("user=user02  \n password = pwd78910")
-
-		secretDockerPlain := []byte("docker-server = https://mydockersever.example \n\n\ndocker-username = tiger \n\ndocker-password = pass113 \n\n docker-email = tiger@acme.com")
-		secretDockerJSON := `{"docker-username": "tiger", "docker-password": "pass113", "docker-email": "tiger@acme.com"}`
-
-		if linkedsecret.Spec.ProviderOptions["secretId"] == "ff000000-f000-f000-f000-ffffffffff00" {
-			return nil, errors.New("secret not found")
-		}
-
-		if linkedsecret.Spec.ProviderOptions["secret"] == "secret-not-found" {
-			return nil, errors.New("secret not found")
-		}
-
-		if linkedsecret.Spec.ProviderOptions["secret"] == "docker-secret-json" {
-			return []byte(secretDockerJSON), nil
-		}
-
-		if linkedsecret.Spec.ProviderOptions["secret"] == "docker-secret-plain" {
-			return secretDockerPlain, nil
-		}
-
-		if linkedsecret.Spec.ProviderSecretFormat == "JSON" {
-			return []byte(secretJSON), nil
-		} else {
-			return secretPlain, nil
-		}
-
-	}
-
 	//retrieve Cloud secret data
 	switch linkedsecret.Spec.Provider {
 	case GOOGLE:
-		//data, err = r.GetGCPSecret(ctx, linkedsecret)
-		data, err = fakeData(linkedsecret)
+		data, err = r.GetGCPSecret(ctx, linkedsecret)
 	case AWS:
-		//data, err = r.GetAWSSecret(ctx, linkedsecret)
-		data, err = fakeData(linkedsecret)
+		data, err = r.GetAWSSecret(ctx, linkedsecret)
 	case AZURE:
-		//data, err = r.GetAzureSecret(ctx, linkedsecret)
-		data, err = fakeData(linkedsecret)
+		data, err = r.GetAzureSecret(ctx, linkedsecret)
 	case IBM:
-		//data, err = r.GetIBMSecret(ctx, linkedsecret)
-		data, err = fakeData(linkedsecret)
+		data, err = r.GetIBMSecret(ctx, linkedsecret)
 	}
 
 	//return error retrieving Cloud secret data
