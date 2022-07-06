@@ -51,7 +51,7 @@ helm search repo kubeideas
 Before install Linkedsecrets Helm chart, install manually Linkedsecrets CRD:
 
 ``` bash
-kubectl apply -f https://github.com/kubeideas/linkedsecrets/releases/download/v0.8.1/security.kubeideas.io_linkedsecrets.yaml
+kubectl apply -f https://github.com/kubeideas/linkedsecrets/releases/download/v0.8.3/security.kubeideas.io_linkedsecrets.yaml
 ```
 
 ## Enable GCP Secret Manager Access
@@ -122,7 +122,7 @@ kubeideas/linkedsecrets
 
 ## Enable Mixed Cloud Secrets Solution Access
 
-This example bellow enable Google Secret Manager and AWS Secrets Manager access, but any combination is allowed.
+This example bellow enables Google Secret Manager and AWS Secrets Manager access, but any combination is allowed.
 
 **[IMPORTANT]** Avoid security issues and grant access only to secrets strictly relevant to your Kubernetes cluster.
 
@@ -167,28 +167,28 @@ kind: LinkedSecret
 metadata:
   name: <LINKEDSECRET-NAME>
 spec:
-  deployment: <DEPLOYMENT-NAME>
+  rolloutRestartDeploy: <DEPLOYMENT-NAME>
   keepSecretOnDelete: <true | false>
-  secretName: <SECRET-NAME-CREATED-AND-MAINTAINED-BY-LINKEDSECRETS-ON-KUBERNETES>
+  secretName: <KUBERNETES-SECRET-NAME-CREATED-AND-MAINTAINED-BY-LINKEDSECRETS>
   schedule: <"@every 10m" | ANY-OTHER-SYNCHRONIZATION-INTERVAL>
   suspended: <true | false>
 ```
 
-## deployment
+## Field rolloutRestartDeploy
 
-Set this field with deployment's name which secret is maintained by LinkedSecrets. If any change is detected, Linkedsecrets will rollout all deployment's pods automatically. This field can be omitted if you don't whant to use this feature.
+Set this field with deployment's name which secret is maintained by LinkedSecrets. If any change is detected, Linkedsecrets will roll out all deployment's pods automatically. This field can be omitted if you don't whant to use this feature.
 
-## keepSecretOnDelete
+## Field keepSecretOnDelete
 
 Set this field to **`true`** if you want to keep secret intact after Linkedsecret object is deleted. This field can be omitted if you don't whant to use this feature.
 
 This feature is particularly useful in upgrade situations.
 
-## secretName
+## Field secretName
 
-Set this field with Kubernetes Secret name you want. Linkedsecrets will create it with data retrieved from Cloud Secret.
+It defines the Kubernetes Secret name that will be created and maintained by Linkedsecrets.
 
-## schedule
+## Field schedule
 
 Linkedsecrets synchronization is executed based on schedule.
 Pre-defined cron expressions and Classic cron expressions are accepted.
@@ -253,7 +253,7 @@ helm -n <LINKEDSECRETS-NAMESPACE> delete linkedsecrets
 ### **Remove Custom Resource Definitions**
 
 ``` bash
-kubectl delete -f https://github.com/kubeideas/linkedsecrets/releases/download/v0.8.1/security.kubeideas.io_linkedsecrets.yaml
+kubectl delete -f https://github.com/kubeideas/linkedsecrets/releases/download/v0.8.3/security.kubeideas.io_linkedsecrets.yaml
 ```
 
 ### **Remove Linkedsecrets namespace**

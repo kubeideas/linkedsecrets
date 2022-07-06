@@ -8,11 +8,11 @@ image:
   proxy:
     repository: gcr.io/kubebuilder/kube-rbac-proxy
     pullPolicy: IfNotPresent
-    tag: "v0.8.0"
+    tag: "v0.11.0"
   manager:
     repository: kubeideas/linkedsecrets
     pullPolicy: IfNotPresent
-    tag: "v0.8.2"
+    tag: "v0.8.3"
 
 
 resources:

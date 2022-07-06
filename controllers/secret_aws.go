@@ -5,6 +5,7 @@ package controllers
 // https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/setting-up.html
 
 import (
+	"context"
 	"encoding/base64"
 	"fmt"
 	securityv1 "kubeideas/linkedsecrets/api/v1"
@@ -12,14 +13,15 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/secretsmanager"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 // Credentials will be provided by environment variables:
 // AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
 // GetAWSSecret return secret data from AWS Secret Manager
-func (r *LinkedSecretReconciler) GetAWSSecret(linkedsecret *securityv1.LinkedSecret) ([]byte, error) {
+func (r *LinkedSecretReconciler) GetAWSSecret(ctx context.Context, linkedsecret *securityv1.LinkedSecret) ([]byte, error) {
 
-	log := r.Log.WithValues("linkedsecret", fmt.Sprintf("%s/%s", linkedsecret.Namespace, linkedsecret.Name))
+	log := log.FromContext(ctx)
 
 	// check required provider options
 	if _, ok := linkedsecret.Spec.ProviderOptions["region"]; !ok {

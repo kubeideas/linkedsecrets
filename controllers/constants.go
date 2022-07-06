@@ -1,16 +1,20 @@
 package controllers
 
-// Status constants
+// Cronjob Status
 const (
 	JOBSCHEDULED         = "Scheduled"
 	JOBSUSPENDED         = "Suspended"
 	JOBNOTSCHEDULED      = "NotScheduled"
 	JOBFAILPARSESCHEDULE = "FailParseSchedule"
-	STATUSSYNCHED        = "Synched"
-	STATUSNOTSYNCHED     = "NotSynched"
 )
 
-// Providers constants
+// secret synch status
+const (
+	STATUSSYNCHED    = "Synched"
+	STATUSNOTSYNCHED = "NotSynched"
+)
+
+// Cloud constants
 const (
 	GOOGLE = "Google"
 	AWS    = "AWS"
@@ -18,8 +22,11 @@ const (
 	IBM    = "IBM"
 )
 
-// Provider data format
+// Cloud Secret data format
 const (
 	JSONFORMAT  = "JSON"
 	PLAINFORMAT = "PLAIN"
 )
+
+//LINKEDSECRETFINALIZER identify linkendsecret to be intercept before delete
+const LINKEDSECRETFINALIZER = "cronjob.finalizers.linkedsecrets.kubeidea.io"

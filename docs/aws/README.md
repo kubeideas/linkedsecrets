@@ -57,15 +57,15 @@ kind: LinkedSecret
 metadata:
   name: <LINKEDSECRET-NAME>
 spec:
-  deployment: <DEPLOYMENT-NAME>
+  rolloutRestartDeploy: <DEPLOYMENT-NAME>
   keepSecretOnDelete: <true | false>
   provider: AWS
-  providerDataFormat: <JSON | PLAIN>
+  providerSecretFormat: <JSON | PLAIN>
   providerOptions:
     secret: <AWS-SECRET-NAME>
     region: <AWS-SECRET-RESOURCE-REGION>
     version: <AWSCURRENT | AWSPREVIOUS> 
-  secretName: <SECRET-NAME-CREATED-AND-MAINTAINED-BY-LINKEDSECRETS-ON-KUBERNETES>
+  secretName: <KUBERNETES-SECRET-NAME-CREATED-AND-MAINTAINED-BY-LINKEDSECRETS>
   schedule: <"@every 10m" | ANY-OTHER-SYNCHRONIZATION-INTERVAL>
   suspended: <true | false>
 ```

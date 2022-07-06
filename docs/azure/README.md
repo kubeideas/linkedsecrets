@@ -80,15 +80,15 @@ kind: LinkedSecret
 metadata:
   name: <LINKEDSECRET-NAME>
 spec:
-  deployment: <DEPLOYMENT-NAME>
+  rolloutRestartDeploy: <DEPLOYMENT-NAME>
   keepSecretOnDelete: <true | false>
   provider: Azure
-  providerDataFormat: <JSON | PLAIN>
+  providerSecretFormat: <JSON | PLAIN>
   providerOptions:
     keyvault: <AZURE-KEYVAULT-NAME>
     secret: <AZURE-SECRET-NAME>
     version: <AWZURE-SECRET-VERSION-ID> 
-  secretName: <SECRET-NAME-CREATED-AND-MAINTAINED-BY-LINKEDSECRETS-ON-KUBERNETES>
+  secretName: <KUBERNETES-SECRET-NAME-CREATED-AND-MAINTAINED-BY-LINKEDSECRETS>
   schedule: <"@every 10m" | ANY-OTHER-SYNCHRONIZATION-INTERVAL>
   suspended: <true | false>
 ```

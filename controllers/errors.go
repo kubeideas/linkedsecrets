@@ -84,3 +84,20 @@ type InvalidUUIDFormat struct {
 func (i *InvalidUUIDFormat) Error() string {
 	return fmt.Sprintf("[ %s ] has invalid UUID format", i.fieldName)
 }
+
+// DeploymentNotDefined error
+type DeploymentNotDefined struct {
+}
+
+func (i *DeploymentNotDefined) Error() string {
+	return "Deployment for rollout restart not defined."
+}
+
+// DeploymentNotFound error
+type DeploymentNotFound struct {
+	name string
+}
+
+func (i *DeploymentNotFound) Error() string {
+	return fmt.Sprintf("Deployment [ %s ] not found", i.name)
+}

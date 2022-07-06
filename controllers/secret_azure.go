@@ -2,20 +2,20 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	securityv1 "kubeideas/linkedsecrets/api/v1"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/keyvault/keyvault"
 	kvauth "github.com/Azure/azure-sdk-for-go/services/keyvault/auth"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 // Credentials will be provided by environment variables:
 // AZURE_TENANT_ID, AZURE_CLIENT_ID and AZURE_CLIENT_SECRET
 // GetAzureSecret return secret data from AWS Secret Manage
-func (r *LinkedSecretReconciler) GetAzureSecret(linkedsecret *securityv1.LinkedSecret) ([]byte, error) {
+func (r *LinkedSecretReconciler) GetAzureSecret(ctx context.Context, linkedsecret *securityv1.LinkedSecret) ([]byte, error) {
 
-	log := r.Log.WithValues("linkedsecret", fmt.Sprintf("%s/%s", linkedsecret.Namespace, linkedsecret.Name))
+	log := log.FromContext(ctx)
 
 	// check required provider options
 	if _, ok := linkedsecret.Spec.ProviderOptions["keyvault"]; !ok {

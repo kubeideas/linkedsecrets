@@ -2,17 +2,17 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	securityv1 "kubeideas/linkedsecrets/api/v1"
 
 	secretmanager "cloud.google.com/go/secretmanager/apiv1"
 	secretmanagerpb "google.golang.org/genproto/googleapis/cloud/secretmanager/v1"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 //GetGCPSecret return secret data from Google Secret Manager
-func (r *LinkedSecretReconciler) GetGCPSecret(linkedsecret *securityv1.LinkedSecret) ([]byte, error) {
+func (r *LinkedSecretReconciler) GetGCPSecret(ctx context.Context, linkedsecret *securityv1.LinkedSecret) ([]byte, error) {
 
-	log := r.Log.WithValues("linkedsecret", fmt.Sprintf("%s/%s", linkedsecret.Namespace, linkedsecret.Name))
+	log := log.FromContext(ctx)
 
 	// check required provider options
 	if _, ok := linkedsecret.Spec.ProviderOptions["project"]; !ok {
@@ -38,7 +38,6 @@ func (r *LinkedSecretReconciler) GetGCPSecret(linkedsecret *securityv1.LinkedSec
 	secretPath := "projects/" + project + "/secrets/" + name + "/versions/" + version
 
 	// Create the client.
-	ctx := context.Background()
 	client, err := secretmanager.NewClient(ctx)
 
 	if err != nil {

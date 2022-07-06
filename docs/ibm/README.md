@@ -47,15 +47,15 @@ kind: LinkedSecret
 metadata:
   name: <LINKEDSECRET-NAME>
 spec:
-  deployment: <DEPLOYMENT-NAME>
+  rolloutRestartDeploy: <DEPLOYMENT-NAME>
   keepSecretOnDelete: <true | false>
   provider: IBM
-  providerDataFormat: <JSON | PLAIN>
+  providerSecretFormat: <JSON | PLAIN>
   providerOptions:
     secretManagerInstanceId: <SECRET-MANAGER-INSTANCE-UUID>
     secretId: <SECRET-UUID>
     region: <SECRET-MANAGER-REGION>
-  secretName: <SECRET-NAME-CREATED-AND-MAINTAINED-BY-LINKEDSECRETS-ON-KUBERNETES>
+  secretName: <KUBERNETES-SECRET-NAME-CREATED-AND-MAINTAINED-BY-LINKEDSECRETS>
   schedule: <"@every 10m" | ANY-OTHER-SYNCHRONIZATION-INTERVAL>
   suspended: <true | false>
 ```
