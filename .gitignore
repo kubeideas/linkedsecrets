@@ -23,9 +23,11 @@ testbin/*
 *.swo
 *~
 
+## vscode
+.vscode/
 
 ## ignore install package
 #install.zip
 
 
-.vscode
+
