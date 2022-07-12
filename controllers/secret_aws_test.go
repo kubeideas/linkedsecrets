@@ -21,8 +21,9 @@ var _ = Describe("Linkedsecret controller AWS", func() {
 	)
 
 	var (
-		awsPlain LinkedSecretTest
-		awsJSON  LinkedSecretTest
+		awsPlain          LinkedSecretTest
+		awsJSON           LinkedSecretTest
+		awsSecretNotFound LinkedSecretTest
 	)
 
 	BeforeEach(func() {
@@ -48,6 +49,19 @@ var _ = Describe("Linkedsecret controller AWS", func() {
 				ProviderSecretFormat: "PLAIN",
 				ProviderOptions:      map[string]string{"secret": "opaque-secret-plain", "region": "us-east-1", "version": "AWSCURRENT"},
 				SecretName:           "mysecret-aws-example2",
+				Schedule:             "@every 10s",
+				Suspended:            false,
+			},
+		}
+
+		awsSecretNotFound = LinkedSecretTest{
+			name:      "aws-example3",
+			namespace: "default",
+			spec: securityv1.LinkedSecretSpec{
+				Provider:             "AWS",
+				ProviderSecretFormat: "PLAIN",
+				ProviderOptions:      map[string]string{"secret": "secret-not-found", "region": "us-east-1", "version": "AWSCURRENT"},
+				SecretName:           "mysecret-aws-example3",
 				Schedule:             "@every 10s",
 				Suspended:            false,
 			},
@@ -92,13 +106,13 @@ var _ = Describe("Linkedsecret controller AWS", func() {
 			Expect(awsExample1.Spec.ProviderOptions["version"]).Should(Equal("AWSCURRENT"))
 			Expect(awsExample1.Spec.SecretName).Should(Equal("mysecret-aws-example1"))
 			Expect(awsExample1.Spec.Suspended).Should(Equal(false))
-			Expect(awsExample1.Spec.Schedule).Should(Equal("@every 1s"))
+			Expect(awsExample1.Spec.Schedule).Should(Equal("@every 10s"))
 
 			// Check status
 			Expect(awsExample1.Status.CurrentSecret).Should(Equal("mysecret-aws-example1"))
 			Expect(awsExample1.Status.CronJobID).Should(Equal(cron.EntryID(awsExample1.Status.CronJobID)))
 			Expect(awsExample1.Status.CronJobStatus).Should(Equal("Scheduled"))
-			Expect(awsExample1.Status.CurrentSchedule).Should(Equal("@every 1s"))
+			Expect(awsExample1.Status.CurrentSchedule).Should(Equal("@every 10s"))
 
 		})
 	})
@@ -139,13 +153,59 @@ var _ = Describe("Linkedsecret controller AWS", func() {
 			Expect(awsExample2.Spec.ProviderOptions["version"]).Should(Equal("AWSCURRENT"))
 			Expect(awsExample2.Spec.SecretName).Should(Equal("mysecret-aws-example2"))
 			Expect(awsExample2.Spec.Suspended).Should(Equal(false))
-			Expect(awsExample2.Spec.Schedule).Should(Equal("@every 1s"))
+			Expect(awsExample2.Spec.Schedule).Should(Equal("@every 10s"))
 
 			// Check status
 			Expect(awsExample2.Status.CurrentSecret).Should(Equal("mysecret-aws-example2"))
 			Expect(awsExample2.Status.CronJobID).Should(Equal(cron.EntryID(awsExample2.Status.CronJobID)))
 			Expect(awsExample2.Status.CronJobStatus).Should(Equal("Scheduled"))
-			Expect(awsExample2.Status.CurrentSchedule).Should(Equal("@every 1s"))
+			Expect(awsExample2.Status.CurrentSchedule).Should(Equal("@every 10s"))
+
+		})
+	})
+
+	Context("When Creating Linkedsecret aws-example3", func() {
+		It("Should create Linkedsecret aws-example3", func() {
+
+			By("Creating aws-example3")
+			ctx := context.Background()
+			linkedSecret := &securityv1.LinkedSecret{
+				TypeMeta:   v1.TypeMeta{Kind: "LinkedSecret", APIVersion: "linkedsecrets/api/v1"},
+				ObjectMeta: v1.ObjectMeta{Name: awsSecretNotFound.name, Namespace: awsSecretNotFound.namespace},
+				Spec:       awsSecretNotFound.spec,
+			}
+			// Create new LinkeSecret
+			Expect(k8sClient.Create(ctx, linkedSecret)).Should(Succeed())
+
+			linkedSecretLookupKey := types.NamespacedName{Namespace: awsSecretNotFound.namespace, Name: awsSecretNotFound.name}
+			awsExample3 := &securityv1.LinkedSecret{}
+
+			// Get linkedSecret
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, linkedSecretLookupKey, awsExample3)
+				if err != nil {
+					return false
+				}
+				if awsExample3.Status.CurrentSecret == "" {
+					return false
+				}
+				return true
+			}, TIMEOUT, INTERVAL).Should(BeTrue())
+
+			// Check spec
+			Expect(awsExample3.Spec.Provider).Should(Equal("AWS"))
+			Expect(awsExample3.Spec.ProviderSecretFormat).Should(Equal("PLAIN"))
+			Expect(awsExample3.Spec.ProviderOptions["secret"]).Should(Equal("secret-not-found"))
+			Expect(awsExample3.Spec.ProviderOptions["region"]).Should(Equal("us-east-1"))
+			Expect(awsExample3.Spec.ProviderOptions["version"]).Should(Equal("AWSCURRENT"))
+			Expect(awsExample3.Spec.SecretName).Should(Equal("mysecret-aws-example3"))
+			Expect(awsExample3.Spec.Suspended).Should(Equal(false))
+			Expect(awsExample3.Spec.Schedule).Should(Equal("@every 10s"))
+
+			// Check status
+			Expect(awsExample3.Status.CurrentSecret).Should(Equal("mysecret-aws-example3"))
+			Expect(awsExample3.Status.CronJobStatus).Should(Equal("NotScheduled"))
+			Expect(awsExample3.Status.CurrentSchedule).Should(Equal("@every 10s"))
 
 		})
 	})

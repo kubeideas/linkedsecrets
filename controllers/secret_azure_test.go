@@ -21,8 +21,9 @@ var _ = Describe("Linkedsecret controller Azure", func() {
 	)
 
 	var (
-		azurePlain LinkedSecretTest
-		azureJSON  LinkedSecretTest
+		azurePlain          LinkedSecretTest
+		azureJSON           LinkedSecretTest
+		azureSuspendedPlain LinkedSecretTest
 	)
 
 	BeforeEach(func() {
@@ -49,6 +50,19 @@ var _ = Describe("Linkedsecret controller Azure", func() {
 				SecretName:           "mysecret-azure-example2",
 				Schedule:             "@every 10s",
 				Suspended:            false,
+			},
+		}
+
+		azureSuspendedPlain = LinkedSecretTest{
+			name:      "azure-example3",
+			namespace: "default",
+			spec: securityv1.LinkedSecretSpec{
+				Provider:             "Azure",
+				ProviderSecretFormat: "PLAIN",
+				ProviderOptions:      map[string]string{"secret": "opaque-secret-plain", "keyvault": "linkedsecret"},
+				SecretName:           "mysecret-azure-example3",
+				Schedule:             "@every 10s",
+				Suspended:            true,
 			},
 		}
 	})
@@ -89,7 +103,7 @@ var _ = Describe("Linkedsecret controller Azure", func() {
 			Expect(azureExample1.Spec.ProviderOptions["keyvault"]).Should(Equal("linkedsecret"))
 			Expect(azureExample1.Spec.SecretName).Should(Equal("mysecret-azure-example1"))
 			Expect(azureExample1.Spec.Suspended).Should(Equal(false))
-			Expect(azureExample1.Spec.Schedule).Should(Equal("@every 1s"))
+			Expect(azureExample1.Spec.Schedule).Should(Equal("@every 10s"))
 
 			// Check status
 			Expect(azureExample1.Status.CurrentSecret).Should(Equal("mysecret-azure-example1"))
@@ -103,7 +117,7 @@ var _ = Describe("Linkedsecret controller Azure", func() {
 
 		It("Should create Linkedsecret azure-example2", func() {
 
-			By("Creating azure-example1")
+			By("Creating azure-example3")
 			ctx := context.Background()
 			linkedSecret := &securityv1.LinkedSecret{
 				TypeMeta:   v1.TypeMeta{Kind: "LinkedSecret", APIVersion: "linkedsecrets/api/v1"},
@@ -135,13 +149,60 @@ var _ = Describe("Linkedsecret controller Azure", func() {
 			Expect(azureExample2.Spec.ProviderOptions["keyvault"]).Should(Equal("linkedsecret"))
 			Expect(azureExample2.Spec.SecretName).Should(Equal("mysecret-azure-example2"))
 			Expect(azureExample2.Spec.Suspended).Should(Equal(false))
-			Expect(azureExample2.Spec.Schedule).Should(Equal("@every 1s"))
+			Expect(azureExample2.Spec.Schedule).Should(Equal("@every 10s"))
 
 			// Check expected status
 			Expect(azureExample2.Status.CurrentSecret).Should(Equal("mysecret-azure-example2"))
 			Expect(azureExample2.Status.CronJobID).Should(Equal(cron.EntryID(azureExample2.Status.CronJobID)))
 			Expect(azureExample2.Status.CronJobStatus).Should(Equal("Scheduled"))
-			Expect(azureExample2.Status.CurrentSchedule).Should(Equal("@every 1s"))
+			Expect(azureExample2.Status.CurrentSchedule).Should(Equal("@every 10s"))
+
+		})
+	})
+
+	Context("When creating Linkedsecret azure-example3", func() {
+
+		It("Should create Linkedsecret azure-example3", func() {
+
+			By("Creating azure-example3")
+			ctx := context.Background()
+			linkedSecret := &securityv1.LinkedSecret{
+				TypeMeta:   v1.TypeMeta{Kind: "LinkedSecret", APIVersion: "linkedsecrets/api/v1"},
+				ObjectMeta: v1.ObjectMeta{Name: azureSuspendedPlain.name, Namespace: azureSuspendedPlain.namespace},
+				Spec:       azureSuspendedPlain.spec,
+			}
+			// Create new LinkeSecret
+			Expect(k8sClient.Create(ctx, linkedSecret)).Should(Succeed())
+
+			linkedSecretLookupKey := types.NamespacedName{Namespace: azureSuspendedPlain.namespace, Name: azureSuspendedPlain.name}
+			azureExample3 := &securityv1.LinkedSecret{}
+
+			// Get linkedSecret
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, linkedSecretLookupKey, azureExample3)
+				if err != nil {
+					return false
+				}
+				if azureExample3.Status.CurrentSecret == "" {
+					return false
+				}
+				return true
+			}, TIMEOUT, INTERVAL).Should(BeTrue())
+
+			// Check expected spec
+			Expect(azureExample3.Spec.Provider).Should(Equal("Azure"))
+			Expect(azureExample3.Spec.ProviderSecretFormat).Should(Equal("PLAIN"))
+			Expect(azureExample3.Spec.ProviderOptions["secret"]).Should(Equal("opaque-secret-plain"))
+			Expect(azureExample3.Spec.ProviderOptions["keyvault"]).Should(Equal("linkedsecret"))
+			Expect(azureExample3.Spec.SecretName).Should(Equal("mysecret-azure-example3"))
+			Expect(azureExample3.Spec.Suspended).Should(Equal(true))
+			Expect(azureExample3.Spec.Schedule).Should(Equal("@every 10s"))
+
+			// Check expected status
+			Expect(azureExample3.Status.CurrentSecret).Should(Equal("mysecret-azure-example3"))
+			Expect(azureExample3.Status.CronJobID).Should(Equal(cron.EntryID(azureExample3.Status.CronJobID)))
+			Expect(azureExample3.Status.CronJobStatus).Should(Equal("Suspended"))
+			Expect(azureExample3.Status.CurrentSchedule).Should(Equal("@every 10s"))
 
 		})
 	})

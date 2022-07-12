@@ -18,15 +18,16 @@ var _ = Describe("Linkedsecret controller IBM", func() {
 		TIMEOUT                 = time.Second * 60
 		DURATION                = time.Second * 10
 		INTERVAL                = time.Millisecond * 250
-		SECRETMANAGERINSTANCEID = "8d2350b3-7ce3-4852-8b4b-a5cc6fd5f146"
-		JSONSECRETID            = "53a1db89-ce4e-0a39-a699-4a91ca9920a5"
-		PLANTEXTSECRETID        = "5c5c4c05-31e8-7c5a-c7bd-e4d7e42d6547"
+		SECRETMANAGERINSTANCEID = "f0a9ef5b-de69-484b-ab84-4181390eec1e"
+		JSONSECRETID            = "15dd61cd-1f3b-02fc-ecd3-14b25c39302d"
+		PLAINTEXTSECRETID       = "baa3a63f-f5ab-eea0-02d9-89556fc54cc5"
 		REGION                  = "us-east"
 	)
 
 	var (
-		ibmPlain LinkedSecretTest
-		ibmJSON  LinkedSecretTest
+		ibmPlain       LinkedSecretTest
+		ibmJSON        LinkedSecretTest
+		ibmInvalidUUID LinkedSecretTest
 	)
 
 	BeforeEach(func() {
@@ -38,7 +39,7 @@ var _ = Describe("Linkedsecret controller IBM", func() {
 				ProviderSecretFormat: "JSON",
 				ProviderOptions:      map[string]string{"secretManagerInstanceId": SECRETMANAGERINSTANCEID, "secretId": JSONSECRETID, "region": REGION},
 				SecretName:           "mysecret-ibm-example1",
-				Schedule:             "@every 1s",
+				Schedule:             "@every 10s",
 				Suspended:            false,
 			},
 		}
@@ -49,9 +50,22 @@ var _ = Describe("Linkedsecret controller IBM", func() {
 			spec: securityv1.LinkedSecretSpec{
 				Provider:             "IBM",
 				ProviderSecretFormat: "PLAIN",
-				ProviderOptions:      map[string]string{"secretManagerInstanceId": SECRETMANAGERINSTANCEID, "secretId": PLANTEXTSECRETID, "region": REGION},
+				ProviderOptions:      map[string]string{"secretManagerInstanceId": SECRETMANAGERINSTANCEID, "secretId": PLAINTEXTSECRETID, "region": REGION},
 				SecretName:           "mysecret-ibm-example2",
-				Schedule:             "@every 1s",
+				Schedule:             "@every 10s",
+				Suspended:            false,
+			},
+		}
+
+		ibmInvalidUUID = LinkedSecretTest{
+			name:      "ibm-example3",
+			namespace: "default",
+			spec: securityv1.LinkedSecretSpec{
+				Provider:             "IBM",
+				ProviderSecretFormat: "PLAIN",
+				ProviderOptions:      map[string]string{"secretManagerInstanceId": "invalid-uuid-uuid-uuid-invalid34uuid", "secretId": PLAINTEXTSECRETID, "region": REGION},
+				SecretName:           "mysecret-ibm-example3",
+				Schedule:             "@every 10s",
 				Suspended:            false,
 			},
 		}
@@ -95,13 +109,13 @@ var _ = Describe("Linkedsecret controller IBM", func() {
 			Expect(ibmExample1.Spec.ProviderOptions["region"]).Should(Equal(REGION))
 			Expect(ibmExample1.Spec.SecretName).Should(Equal("mysecret-ibm-example1"))
 			Expect(ibmExample1.Spec.Suspended).Should(Equal(false))
-			Expect(ibmExample1.Spec.Schedule).Should(Equal("@every 1s"))
+			Expect(ibmExample1.Spec.Schedule).Should(Equal("@every 10s"))
 
 			// Check status
 			Expect(ibmExample1.Status.CurrentSecret).Should(Equal("mysecret-ibm-example1"))
 			Expect(ibmExample1.Status.CronJobID).Should(Equal(cron.EntryID(1)))
 			Expect(ibmExample1.Status.CronJobStatus).Should(Equal("Scheduled"))
-			Expect(ibmExample1.Status.CurrentSchedule).Should(Equal("@every 1s"))
+			Expect(ibmExample1.Status.CurrentSchedule).Should(Equal("@every 10s"))
 
 		})
 	})
@@ -139,17 +153,63 @@ var _ = Describe("Linkedsecret controller IBM", func() {
 			Expect(ibmExample2.Spec.Provider).Should(Equal("IBM"))
 			Expect(ibmExample2.Spec.ProviderSecretFormat).Should(Equal("PLAIN"))
 			Expect(ibmExample2.Spec.ProviderOptions["secretManagerInstanceId"]).Should(Equal(SECRETMANAGERINSTANCEID))
-			Expect(ibmExample2.Spec.ProviderOptions["secretId"]).Should(Equal(PLANTEXTSECRETID))
+			Expect(ibmExample2.Spec.ProviderOptions["secretId"]).Should(Equal(PLAINTEXTSECRETID))
 			Expect(ibmExample2.Spec.ProviderOptions["region"]).Should(Equal(REGION))
 			Expect(ibmExample2.Spec.SecretName).Should(Equal("mysecret-ibm-example2"))
 			Expect(ibmExample2.Spec.Suspended).Should(Equal(false))
-			Expect(ibmExample2.Spec.Schedule).Should(Equal("@every 1s"))
+			Expect(ibmExample2.Spec.Schedule).Should(Equal("@every 10s"))
 
 			// Check status
 			Expect(ibmExample2.Status.CurrentSecret).Should(Equal("mysecret-ibm-example2"))
 			Expect(ibmExample2.Status.CronJobID).Should(Equal(cron.EntryID(1)))
 			Expect(ibmExample2.Status.CronJobStatus).Should(Equal("Scheduled"))
-			Expect(ibmExample2.Status.CurrentSchedule).Should(Equal("@every 1s"))
+			Expect(ibmExample2.Status.CurrentSchedule).Should(Equal("@every 10s"))
+
+		})
+	})
+
+	Context("When creating Linkedsecret ibm-example3", func() {
+
+		It("Should create Linkedsecret ibm-example3", func() {
+
+			By("Creating Linkedsecret ibm-example3")
+			ctx := context.Background()
+			linkedSecret := &securityv1.LinkedSecret{
+				TypeMeta:   v1.TypeMeta{Kind: "LinkedSecret", APIVersion: "linkedsecrets/api/v1"},
+				ObjectMeta: v1.ObjectMeta{Name: ibmInvalidUUID.name, Namespace: ibmInvalidUUID.namespace},
+				Spec:       ibmInvalidUUID.spec,
+			}
+			// Create new LinkeSecret
+			Expect(k8sClient.Create(ctx, linkedSecret)).Should(Succeed())
+
+			linkedSecretLookupKey := types.NamespacedName{Namespace: ibmInvalidUUID.namespace, Name: ibmInvalidUUID.name}
+			ibmExample3 := &securityv1.LinkedSecret{}
+
+			// Get linkedSecret
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, linkedSecretLookupKey, ibmExample3)
+				if err != nil {
+					return false
+				}
+				if ibmExample3.Status.CurrentSecret == "" {
+					return false
+				}
+				return true
+			}, TIMEOUT, INTERVAL).Should(BeTrue())
+
+			// Check spec
+			Expect(ibmExample3.Spec.Provider).Should(Equal("IBM"))
+			Expect(ibmExample3.Spec.ProviderSecretFormat).Should(Equal("PLAIN"))
+			Expect(ibmExample3.Spec.ProviderOptions["secretId"]).Should(Equal(PLAINTEXTSECRETID))
+			Expect(ibmExample3.Spec.ProviderOptions["region"]).Should(Equal(REGION))
+			Expect(ibmExample3.Spec.SecretName).Should(Equal("mysecret-ibm-example3"))
+			Expect(ibmExample3.Spec.Suspended).Should(Equal(false))
+			Expect(ibmExample3.Spec.Schedule).Should(Equal("@every 10s"))
+
+			// Check status
+			Expect(ibmExample3.Status.CurrentSecret).Should(Equal("mysecret-ibm-example3"))
+			Expect(ibmExample3.Status.CronJobStatus).Should(Equal("NotScheduled"))
+			Expect(ibmExample3.Status.CurrentSchedule).Should(Equal("@every 10s"))
 
 		})
 	})
