@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	securityv1 "kubeideas/linkedsecrets/api/v1"
+	"os"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -15,19 +16,22 @@ import (
 var _ = Describe("Linkedsecret controller IBM", func() {
 
 	const (
-		TIMEOUT                 = time.Second * 60
-		DURATION                = time.Second * 10
-		INTERVAL                = time.Millisecond * 250
-		SECRETMANAGERINSTANCEID = "f0a9ef5b-de69-484b-ab84-4181390eec1e"
-		JSONSECRETID            = "15dd61cd-1f3b-02fc-ecd3-14b25c39302d"
-		PLAINTEXTSECRETID       = "baa3a63f-f5ab-eea0-02d9-89556fc54cc5"
-		REGION                  = "us-east"
+		TIMEOUT  = time.Second * 60
+		DURATION = time.Second * 10
+		INTERVAL = time.Millisecond * 250
+		//secretManagerInstance = "f0a9ef5b-de69-484b-ab84-4181390eec1e"
+		//ibmJSONSecretUUID            = "15dd61cd-1f3b-02fc-ecd3-14b25c39302d"
+		//ibmPlainSecretUUID       = "baa3a63f-f5ab-eea0-02d9-89556fc54cc5"
+		REGION = "us-east"
 	)
 
 	var (
-		ibmPlain       LinkedSecretTest
-		ibmJSON        LinkedSecretTest
-		ibmInvalidUUID LinkedSecretTest
+		secretManagerInstanceId = os.Getenv("SECRET_MANAGER_UUID")
+		ibmJSONSecretUUID       = os.Getenv("SECRET_JSON_UUID")
+		ibmPlainSecretUUID      = os.Getenv("SECRET_PLAIN_UUID")
+		ibmPlain                LinkedSecretTest
+		ibmJSON                 LinkedSecretTest
+		ibmInvalidUUID          LinkedSecretTest
 	)
 
 	BeforeEach(func() {
@@ -37,7 +41,7 @@ var _ = Describe("Linkedsecret controller IBM", func() {
 			spec: securityv1.LinkedSecretSpec{
 				Provider:             "IBM",
 				ProviderSecretFormat: "JSON",
-				ProviderOptions:      map[string]string{"secretManagerInstanceId": SECRETMANAGERINSTANCEID, "secretId": JSONSECRETID, "region": REGION},
+				ProviderOptions:      map[string]string{"secretManagerInstanceId": secretManagerInstanceId, "secretId": ibmJSONSecretUUID, "region": REGION},
 				SecretName:           "mysecret-ibm-example1",
 				Schedule:             "@every 10s",
 				Suspended:            false,
@@ -50,7 +54,7 @@ var _ = Describe("Linkedsecret controller IBM", func() {
 			spec: securityv1.LinkedSecretSpec{
 				Provider:             "IBM",
 				ProviderSecretFormat: "PLAIN",
-				ProviderOptions:      map[string]string{"secretManagerInstanceId": SECRETMANAGERINSTANCEID, "secretId": PLAINTEXTSECRETID, "region": REGION},
+				ProviderOptions:      map[string]string{"secretManagerInstanceId": secretManagerInstanceId, "secretId": ibmPlainSecretUUID, "region": REGION},
 				SecretName:           "mysecret-ibm-example2",
 				Schedule:             "@every 10s",
 				Suspended:            false,
@@ -63,7 +67,7 @@ var _ = Describe("Linkedsecret controller IBM", func() {
 			spec: securityv1.LinkedSecretSpec{
 				Provider:             "IBM",
 				ProviderSecretFormat: "PLAIN",
-				ProviderOptions:      map[string]string{"secretManagerInstanceId": "invalid-uuid-uuid-uuid-invalid34uuid", "secretId": PLAINTEXTSECRETID, "region": REGION},
+				ProviderOptions:      map[string]string{"secretManagerInstanceId": "invalid-uuid-uuid-uuid-invalid34uuid", "secretId": ibmPlainSecretUUID, "region": REGION},
 				SecretName:           "mysecret-ibm-example3",
 				Schedule:             "@every 10s",
 				Suspended:            false,
@@ -104,8 +108,8 @@ var _ = Describe("Linkedsecret controller IBM", func() {
 			// Check spec
 			Expect(ibmExample1.Spec.Provider).Should(Equal("IBM"))
 			Expect(ibmExample1.Spec.ProviderSecretFormat).Should(Equal("JSON"))
-			Expect(ibmExample1.Spec.ProviderOptions["secretManagerInstanceId"]).Should(Equal(SECRETMANAGERINSTANCEID))
-			Expect(ibmExample1.Spec.ProviderOptions["secretId"]).Should(Equal(JSONSECRETID))
+			Expect(ibmExample1.Spec.ProviderOptions["secretManagerInstanceId"]).Should(Equal(secretManagerInstanceId))
+			Expect(ibmExample1.Spec.ProviderOptions["secretId"]).Should(Equal(ibmJSONSecretUUID))
 			Expect(ibmExample1.Spec.ProviderOptions["region"]).Should(Equal(REGION))
 			Expect(ibmExample1.Spec.SecretName).Should(Equal("mysecret-ibm-example1"))
 			Expect(ibmExample1.Spec.Suspended).Should(Equal(false))
@@ -113,7 +117,7 @@ var _ = Describe("Linkedsecret controller IBM", func() {
 
 			// Check status
 			Expect(ibmExample1.Status.CurrentSecret).Should(Equal("mysecret-ibm-example1"))
-			Expect(ibmExample1.Status.CronJobID).Should(Equal(cron.EntryID(1)))
+			Expect(ibmExample1.Status.CronJobID).Should(Equal(cron.EntryID(ibmExample1.Status.CronJobID)))
 			Expect(ibmExample1.Status.CronJobStatus).Should(Equal("Scheduled"))
 			Expect(ibmExample1.Status.CurrentSchedule).Should(Equal("@every 10s"))
 
@@ -152,8 +156,8 @@ var _ = Describe("Linkedsecret controller IBM", func() {
 			// Check spec
 			Expect(ibmExample2.Spec.Provider).Should(Equal("IBM"))
 			Expect(ibmExample2.Spec.ProviderSecretFormat).Should(Equal("PLAIN"))
-			Expect(ibmExample2.Spec.ProviderOptions["secretManagerInstanceId"]).Should(Equal(SECRETMANAGERINSTANCEID))
-			Expect(ibmExample2.Spec.ProviderOptions["secretId"]).Should(Equal(PLAINTEXTSECRETID))
+			Expect(ibmExample2.Spec.ProviderOptions["secretManagerInstanceId"]).Should(Equal(secretManagerInstanceId))
+			Expect(ibmExample2.Spec.ProviderOptions["secretId"]).Should(Equal(ibmPlainSecretUUID))
 			Expect(ibmExample2.Spec.ProviderOptions["region"]).Should(Equal(REGION))
 			Expect(ibmExample2.Spec.SecretName).Should(Equal("mysecret-ibm-example2"))
 			Expect(ibmExample2.Spec.Suspended).Should(Equal(false))
@@ -161,7 +165,7 @@ var _ = Describe("Linkedsecret controller IBM", func() {
 
 			// Check status
 			Expect(ibmExample2.Status.CurrentSecret).Should(Equal("mysecret-ibm-example2"))
-			Expect(ibmExample2.Status.CronJobID).Should(Equal(cron.EntryID(1)))
+			Expect(ibmExample2.Status.CronJobID).Should(Equal(cron.EntryID(ibmExample2.Status.CronJobID)))
 			Expect(ibmExample2.Status.CronJobStatus).Should(Equal("Scheduled"))
 			Expect(ibmExample2.Status.CurrentSchedule).Should(Equal("@every 10s"))
 
@@ -200,7 +204,7 @@ var _ = Describe("Linkedsecret controller IBM", func() {
 			// Check spec
 			Expect(ibmExample3.Spec.Provider).Should(Equal("IBM"))
 			Expect(ibmExample3.Spec.ProviderSecretFormat).Should(Equal("PLAIN"))
-			Expect(ibmExample3.Spec.ProviderOptions["secretId"]).Should(Equal(PLAINTEXTSECRETID))
+			Expect(ibmExample3.Spec.ProviderOptions["secretId"]).Should(Equal(ibmPlainSecretUUID))
 			Expect(ibmExample3.Spec.ProviderOptions["region"]).Should(Equal(REGION))
 			Expect(ibmExample3.Spec.SecretName).Should(Equal("mysecret-ibm-example3"))
 			Expect(ibmExample3.Spec.Suspended).Should(Equal(false))
