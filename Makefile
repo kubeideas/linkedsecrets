@@ -100,6 +100,7 @@ deploy: manifests kustomize ## Deploy controller to the K8s cluster specified in
 undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/config. Call with ignore-not-found=true to ignore resource not found errors during deletion.
 	$(KUSTOMIZE) build config/default | kubectl delete --ignore-not-found=$(ignore-not-found) -f -
 
+
 ##@ Custom
 .PHONY: docker-build-no-test
 docker-build-no-test: ## Build docker image with the manager.
@@ -108,7 +109,8 @@ docker-build-no-test: ## Build docker image with the manager.
 export MY_PROJECT_DIR=$(shell pwd)
 .PHONY: helm-repo
 helm-repo: 
-	${MY_PROJECT_DIR}/helm/update_repo.sh;
+	${MY_PROJECT_DIR}/helm/update_repo.sh;	
+
 
 ##@ Build Dependencies
 

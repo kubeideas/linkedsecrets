@@ -23,36 +23,36 @@ import (
 
 // LinkedSecretSpec defines the desired state of LinkedSecret
 type LinkedSecretSpec struct {
-	// +kubebuilder:validation:Enum={"Google","AWS","Azure","IBM"}
-	// +kubebuilder:validation:Required
-	// Supported cloud secret manager. Valid options: Google,AWS,Azure,IBM.
+	//+kubebuilder:validation:Enum={"Google","AWS","Azure","IBM"}
+	//+kubebuilder:validation:Required
+	// Supported Providers. Valid options: Google,AWS,Azure,IBM.
 	Provider string `json:"provider"`
 
-	// +kubebuilder:validation:Enum={"PLAIN", "JSON"}
-	// +kubebuilder:validation:Required
+	//+kubebuilder:validation:Enum={"PLAIN", "JSON"}
+	//+kubebuilder:validation:Required
 	// Supported formats: PLAIN and JSON
 	// "PLAIN" format key/value must be delimited by character "=".
 	// Empty lines, key without value and value without key will be skipped.
 	// Leading and trailing whitespaces will be ignored. Ex: password=pass12@#=+$% or password = pass12@#=+$% (with whitespaces).
 	// "JSON" format must be key/value format. Ex: {"pasword":"pass12@#=+$%","host":"myhost"}.
-	ProviderDataFormat string `json:"providerDataFormat"`
+	ProviderSecretFormat string `json:"providerSecretFormat"`
 
-	// +optional
-	// Extra options necessary to fetch Cloud secret. If version is omitted, secret latest version will be used regardeless of Cloud provider.
+	//+optional
+	// Specific Provider options to fetch secret. If version is omitted, secret latest version will be used regardeless of Cloud provider.
 	// Example GCP: project: <PROJECT-ID>, secret: <GCP-SECRET-NAME>, version: <latest|"1"|"2"|...>.
 	// Example AWS: region: <AWS-REGION>, secret: <AWS-SECRET-NAME>, version: <AWSPREVIOUS|AWSCURRENT>.
 	// Example Azure: keyvault: <KEYVAULT-NAME>, secret: <AZURE-SECRET-NAME>, version: <AZURE-SECRET-VERSION-ID>.
 	// Example IBM: secretManagerInstanceId: <SECRET-MANAGER-INSTANCE-UUID> , secretId: <IBM-SECRET-UUID>, region: <IBM-REGION>
 	ProviderOptions map[string]string `json:"providerOptions,omitempty"`
 
-	// +kubebuilder:validation:Type=string
-	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:Pattern=[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*
-	// Secret name expected to be created into kubernetes with data fetched from Cloud secret manager solution.
+	//+kubebuilder:validation:Type=string
+	//+kubebuilder:validation:Required
+	//+kubebuilder:validation:Pattern=[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*
+	// Kubernetes secret name that will be created with data fetched from Cloud secret.
 	SecretName string `json:"secretName"`
 
-	// +kubebuilder:validation:Type=string
-	// +optional
+	//+kubebuilder:validation:Type=string
+	//+optional
 	// Schedule define interval to synchronize cloud secrets data and kubernetes secrets.
 	// Examples of valid schedule: "@every 120s"(every 2 minutes), "@every 1m30s" (every 1 minute and 30 seconds),
 	// "@every 10m" (every 10 minutes), "@every 1h" (every hour), "*/5 * * * * *" (every 5 minutes).
@@ -61,44 +61,41 @@ type LinkedSecretSpec struct {
 	// check Secret Manager pricing details in order to avoid unneeded cloud costs.
 	Schedule string `json:"schedule,omitempty"`
 
-	// +kubebuilder:validation:Type=boolean
-	// +optional
+	//+kubebuilder:validation:Type=boolean
+	//+kubebuilder:default=false
+	//+optional
 	// Use this field to suspend cronjob temporarily. Valid values: {true, false}
 	Suspended bool `json:"suspended,omitempty"`
 
-	// +kubebuilder:validation:Type=boolean
-	// +optional
+	//+kubebuilder:validation:Type=boolean
+	//+kubebuilder:default=false
+	//+optional
 	// Use this field keep secret after LinkedSecret deletion. Valid values: {true, false}
 	KeepSecretOnDelete bool `json:"keepSecretOnDelete,omitempty"`
 
-	// +kubebuilder:validation:Type=string
-	// Deployment name which pods will be restarted if secret data key or value were changed.
-	// Pods rollout update will happen 5 seconds after secret was updated.
-	Deployment string `json:"deployment,omitempty"`
+	//+kubebuilder:validation:Type=string
+	//+optional
+	// RolloutRestartDeploy is the deployment name which rollout restart will be applied.
+	// Deployment rollout restart will happen 5 seconds after secret was updated.
+	RolloutRestartDeploy string `json:"rolloutRestartDeploy,omitempty"`
 }
 
 // LinkedSecretStatus defines the observed state of LinkedSecret
 type LinkedSecretStatus struct {
+
+	// Cronjob current schedule.
+	CurrentSecret string `json:"currentSecret,omitempty"`
+
 	// if "CurrentSecretStatus = Synched" data between cloud provider and kubernetes secret were synchronized.
 	// if "CurrentSecretStatus = NotSynched" may have occured an error during synchronization process.
 	// Please check linkedsecret events for more details.
-	CurrentSecretStatus string `json:"createdSecretStatus,omitempty"`
-
-	// Secret name currently being used.
-	CreatedSecret string `json:"createdSecret,omitempty"`
-
-	// Secret namespace currently being used.
-	CreatedSecretNamespace string `json:"createdSecretNamespace,omitempty"`
+	CurrentSecretStatus string `json:"currentSecretStatus,omitempty"`
 
 	// Last time secret was synchronized.
 	LastScheduleExecution *metav1.Time `json:"lastScheduleExecution,omitempty"`
-	//NextScheduleExecution  *metav1.Time `json:"nextScheduleExecution,omitempty"`
 
-	// Provider name currently being used.
-	CurrentProvider string `json:"currentProvider"`
-
-	// Provider options currently being used.
-	CurrentProviderOptions map[string]string `json:"currentProviderOptions,omitempty"`
+	// Next time secret will be synchronized.
+	NextScheduleExecution *metav1.Time `json:"nextScheduleExecution,omitempty"`
 
 	// Cronjob current status.
 	// If "CronJobStatus = Scheduled" job schedule is normal.
@@ -106,30 +103,31 @@ type LinkedSecretStatus struct {
 	// Please check linkedsecret events for more details.
 	CronJobStatus string `json:"cronJobStatus,omitempty"`
 
+	// Cronjob current schedule.
+	CurrentSchedule string `json:"currentSchedule,omitempty"`
+
+	// Current generation
+	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
+
 	// Cronjob current ID.
 	// "If CronJobID > 0", job schedule is normal.
 	// "If CronJobID = -1", may have occured an error during schedule process, schedule is empty or schedule format is invalid.
 	// Please check linkedsecret events for more details.
 	CronJobID cron.EntryID `json:"cronJobID,omitempty"`
-
-	// Cronjob current schedule.
-	CurrentSchedule string `json:"currentSchedule,omitempty"`
-
-	// If value is "true" secret wont be deleted after LinkedSecret deletion.
-	KeepSecretOnDelete bool `json:"keepSecretOnDelete,omitempty"`
 }
 
-// +kubebuilder:object:root=true
-// +kubebuilder:subresource:status
-// +kubebuilder:printcolumn:JSONPath=".status.currentProvider",name="provider",type="string"
-// +kubebuilder:printcolumn:JSONPath=".status.createdSecretStatus",name="status",type="string"
-// +kubebuilder:printcolumn:JSONPath=".status.createdSecret",name="secret",type="string"
-// +kubebuilder:printcolumn:JSONPath=".status.keepSecretOnDelete",name="keep-on-delete",type="boolean"
-// +kubebuilder:printcolumn:JSONPath=".status.lastScheduleExecution",name="last-sync",type="string"
-// +kubebuilder:printcolumn:JSONPath=".status.cronJobStatus",name="cron-job-status",type="string"
-// +kubebuilder:printcolumn:JSONPath=".status.currentSchedule",name="current-schedule",type="string"
-// +kubebuilder:resource:shortName=lns
-// +kubebuilder:storageversion
+//+kubebuilder:object:root=true
+//+kubebuilder:subresource:status
+//+kubebuilder:printcolumn:JSONPath=".spec.provider",name="provider",type="string"
+//+kubebuilder:printcolumn:JSONPath=".status.currentSecret",name="current-secret",type="string"
+//+kubebuilder:printcolumn:JSONPath=".spec.keepSecretOnDelete",name="keep-on-delete",type="boolean"
+//+kubebuilder:printcolumn:JSONPath=".status.currentSecretStatus",name="secret-status",type="string"
+//+kubebuilder:printcolumn:JSONPath=".status.lastScheduleExecution",name="last-sync",type="string"
+//+kubebuilder:printcolumn:JSONPath=".status.nextScheduleExecution",name="next-sync",type="string"
+//+kubebuilder:printcolumn:JSONPath=".status.cronJobStatus",name="cron-job-status",type="string"
+//+kubebuilder:printcolumn:JSONPath=".status.currentSchedule",name="current-schedule",type="string"
+//+kubebuilder:resource:shortName=lns
+//+kubebuilder:storageversion
 
 // LinkedSecret is the Schema for the linkedsecrets API
 type LinkedSecret struct {

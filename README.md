@@ -1,6 +1,6 @@
 # Linkedsecrets
 
-Linkedsecrets is a Kubernetes operator designed to synchronize data between cloud secrets manager solutions and kubernetes secrets.
+Linkedsecrets is a Kubernetes operator designed to synchronize kubernetes secrets with cloud secrets manager secrets.
 
 Supported Cloud secret solutions:
 

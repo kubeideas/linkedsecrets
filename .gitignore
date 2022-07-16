@@ -1,4 +1,3 @@
-
 # Binaries for programs and plugins
 *.exe
 *.exe~
@@ -24,10 +23,11 @@ testbin/*
 *.swo
 *~
 
+## vscode
+.vscode/
 
 ## ignore install package
-install.zip
+#install.zip
 
 
-## vscode
-.vscode
+

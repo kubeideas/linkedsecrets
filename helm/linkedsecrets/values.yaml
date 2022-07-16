@@ -8,20 +8,40 @@ image:
   proxy:
     repository: gcr.io/kubebuilder/kube-rbac-proxy
     pullPolicy: IfNotPresent
-    tag: "v0.8.0"
+    tag: "v0.11.0"
   manager:
     repository: kubeideas/linkedsecrets
     pullPolicy: IfNotPresent
-    tag: "v0.8.2"
+    tag: "v0.8.3"
 
 
 resources:
-  limits:
-    cpu: 100m
-    memory: 100Mi
-  requests:
-    cpu: 50m
-    memory: 50Mi
+  proxy:
+    limits:
+      cpu: 100m
+      memory: 100Mi
+    requests:
+      cpu: 50m
+      memory: 50Mi
+  manager:
+    limits:
+      cpu: 100m
+      memory: 100Mi
+    requests:
+      cpu: 50m
+      memory: 50Mi    
+
+flags:
+  proxy:
+    - --secure-listen-address=0.0.0.0:8443
+    - --upstream=http://127.0.0.1:8080/
+    - --logtostderr=true
+    - --v=10
+  manager:
+    - --health-probe-bind-address=:8081
+    - --metrics-bind-address=127.0.0.1:8080
+    - --leader-elect=true
+    - --zap-devel=true
 
 ## Cloud Credentials 
 gcp:

@@ -8,25 +8,27 @@ import (
 
 	appsv1 "k8s.io/api/apps/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 // Apply deployment rollout update in order to update environment variables with new secret data
-func (r *LinkedSecretReconciler) rolloutUpdate(ctx context.Context, linkedsecret *securityv1.LinkedSecret) {
+func (r *LinkedSecretReconciler) rolloutUpdateDeployment(ctx context.Context, linkedsecret *securityv1.LinkedSecret) error {
 
-	log := r.Log.WithValues("linkedsecret", fmt.Sprintf("%s/%s", linkedsecret.Namespace, linkedsecret.Name))
+	log := log.FromContext(ctx)
 
-	if linkedsecret.Spec.Deployment == "" {
+	if linkedsecret.Spec.RolloutRestartDeploy == "" {
 		log.V(1).Info("Rollout update ignored", "deployment", "not defined")
-
+		return &DeploymentNotDefined{}
 	}
 
 	// Get deploy to update
 	var lnsDeployment appsv1.Deployment
 
-	deployName := client.ObjectKey{Namespace: linkedsecret.Namespace, Name: linkedsecret.Spec.Deployment}
+	deployName := client.ObjectKey{Namespace: linkedsecret.Namespace, Name: linkedsecret.Spec.RolloutRestartDeploy}
 
 	if err := r.Get(ctx, deployName, &lnsDeployment); err != nil {
-		log.V(1).Info("Rollout update ignored", "Deployment", fmt.Sprintf("%s/%s not found", linkedsecret.Namespace, linkedsecret.Spec.Deployment))
+		log.V(1).Info("Rollout update ignored", "Error", &DeploymentNotFound{name: linkedsecret.Spec.RolloutRestartDeploy})
+		return &DeploymentNotFound{name: linkedsecret.Spec.RolloutRestartDeploy}
 	}
 
 	// Create restart annotation
@@ -40,8 +42,11 @@ func (r *LinkedSecretReconciler) rolloutUpdate(ctx context.Context, linkedsecret
 	updateOpts := &client.UpdateOptions{}
 	if err := r.Update(ctx, &lnsDeployment, updateOpts); err != nil {
 		log.Info("Error Adding annotations to deployment", "Error", err)
+		return err
 	}
 
-	log.V(1).Info("Rollout update succeed", "Deployment", fmt.Sprintf("%s/%s", lnsDeployment.Namespace, lnsDeployment.Name))
+	log.V(1).Info("Restart annotation added", "Deployment", fmt.Sprintf("%s/%s", lnsDeployment.Namespace, lnsDeployment.Name))
+
+	return nil
 
 }

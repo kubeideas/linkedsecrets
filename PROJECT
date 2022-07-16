@@ -1,7 +1,7 @@
 domain: kubeideas.io
 layout:
 - go.kubebuilder.io/v3
-projectName: linkedsecrets-new
+projectName: newlinkedsecrets
 repo: kubeideas/linkedsecrets
 resources:
 - api:

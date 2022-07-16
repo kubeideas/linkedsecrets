@@ -113,12 +113,9 @@ func (in *LinkedSecretStatus) DeepCopyInto(out *LinkedSecretStatus) {
 		in, out := &in.LastScheduleExecution, &out.LastScheduleExecution
 		*out = (*in).DeepCopy()
 	}
-	if in.CurrentProviderOptions != nil {
-		in, out := &in.CurrentProviderOptions, &out.CurrentProviderOptions
-		*out = make(map[string]string, len(*in))
-		for key, val := range *in {
-			(*out)[key] = val
-		}
+	if in.NextScheduleExecution != nil {
+		in, out := &in.NextScheduleExecution, &out.NextScheduleExecution
+		*out = (*in).DeepCopy()
 	}
 }
 

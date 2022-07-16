@@ -12,23 +12,23 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 
-// UpdateLinkedSecret apply any change made on linkedsecret and synchronize  kubernetes secret
-func (r *LinkedSecretReconciler) UpdateLinkedSecret(ctx context.Context, linkedsecret *securityv1.LinkedSecret) error {
+// NewSecret create new kubernetes secret, fetch data from cloud secret manager and add cronjob to get it synchronized autimatically
+func (r *LinkedSecretReconciler) NewSecret(ctx context.Context, linkedsecret *securityv1.LinkedSecret) error {
 
 	log := log.FromContext(ctx)
 
-	log.V(1).Info("BEGIN RECONCILING - UPDATE", "linkedsecret", fmt.Sprintf("%s/%s", linkedsecret.Namespace, linkedsecret.Name))
+	log.V(1).Info("BEGIN ADD NEW SECRET", "secret", fmt.Sprintf("%s/%s", linkedsecret.Namespace, linkedsecret.Spec.SecretName))
 
 	// Remove cronjob
-	if err := r.removeCronJob(ctx, linkedsecret); err != nil {
-		return err
-	}
+	//if err := r.removeCronJob(ctx, linkedsecret); err != nil {
+	//	return err
+	//}
 
-	// Get cloud secret data
+	// create kubernetes secret  with cloud secret
 	secret, err := r.GetCloudSecret(ctx, linkedsecret)
 
 	if err != nil {
-		r.Recorder.Event(linkedsecret, "Warning", "FailSynchSecret", err.Error())
+		r.Recorder.Event(linkedsecret, "Warning", "FailSynching", err.Error())
 		linkedsecret.Status.CurrentSecretStatus = STATUSNOTSYNCHED
 		linkedsecret.Status.NextScheduleExecution = nil
 		linkedsecret.Status.CronJobStatus = JOBNOTSCHEDULED
@@ -48,63 +48,50 @@ func (r *LinkedSecretReconciler) UpdateLinkedSecret(ctx context.Context, linkeds
 		}
 	}
 
-	// check secret data changes
-	isEqual := r.checkDiff(ctx, linkedsecret, secret)
+	createOptions := &client.CreateOptions{FieldManager: linkedsecret.Name}
 
-	// update existent secret
-	updateOpts := &client.UpdateOptions{FieldManager: linkedsecret.Name}
-	if err := r.Update(ctx, &secret, updateOpts); err != nil {
-
-		r.Recorder.Event(linkedsecret, "Warning", "FailUpdating", err.Error())
+	if err = r.Create(ctx, &secret, createOptions); err != nil {
+		r.Recorder.Event(linkedsecret, "Warning", "FailCreating", err.Error())
 		linkedsecret.Status.CurrentSecretStatus = STATUSNOTSYNCHED
 
 		if err := r.Status().Update(ctx, linkedsecret); err != nil {
 			return err
 		}
-
 		return err
 	}
 
-	log.V(1).Info("Secret updated", "secret", fmt.Sprintf("Secret %s/%s", secret.Namespace, secret.Name))
+	log.V(1).Info("Secret created", "secret", fmt.Sprintf("%s/%s", secret.Namespace, secret.Name))
 
-	// Deployment rollout update
-	if !isEqual {
-		r.rolloutUpdateDeployment(ctx, linkedsecret)
-	}
-
-	// update linkedsecret status
+	// set status
 	linkedsecret.Status.CurrentSecretStatus = STATUSSYNCHED
+	linkedsecret.Status.LastScheduleExecution = &metav1.Time{Time: time.Now()}
 	linkedsecret.Status.CurrentSchedule = linkedsecret.Spec.Schedule
 	linkedsecret.Status.ObservedGeneration = linkedsecret.Generation
 	linkedsecret.Status.CurrentSecret = linkedsecret.Spec.SecretName
-	linkedsecret.Status.LastScheduleExecution = &metav1.Time{Time: time.Now()}
 
-	// Suspend cronjob
+	// set status for linkedsecret without synchronization
 	if linkedsecret.Spec.Suspended {
-		//set cronjob suspended
 		linkedsecret.Status.CronJobStatus = JOBSUSPENDED
 		linkedsecret.Status.NextScheduleExecution = nil
 
+		//update linkedsecret
 		if err := r.Status().Update(ctx, linkedsecret); err != nil {
 			return err
 		}
-		r.Recorder.Event(linkedsecret, "Warning", "Cronjob suspended", linkedsecret.Name)
+		r.Recorder.Event(linkedsecret, "Warning", "Sync suspended", linkedsecret.Name)
 	}
 
-	// Add cronjob
+	// create secret cronjob if a schedule was defined
 	if linkedsecret.Spec.Schedule != "" && !linkedsecret.Spec.Suspended {
 		if err := r.addCronjob(ctx, linkedsecret); err != nil {
 			return err
 		}
 	}
 
-	//debug info
-	log.V(1).Info("Linkedsecret updated", "ObservedGeneration", linkedsecret.Status.ObservedGeneration)
+	// Record secret created
+	r.Recorder.Event(linkedsecret, "Normal", "Created", fmt.Sprintf("Secret %s/%s", secret.Namespace, secret.Name))
 
-	// Record linkedsecret updated
-	r.Recorder.Event(linkedsecret, "Normal", "Updated", linkedsecret.Name)
-
-	log.V(1).Info("END RECONCILING - UPDATE", "linkedsecret", fmt.Sprintf("%s/%s", linkedsecret.Namespace, linkedsecret.Name))
+	log.V(1).Info("END ADD NEW SECRET", "secret", fmt.Sprintf("%s/%s", linkedsecret.Namespace, linkedsecret.Spec.SecretName))
 
 	return nil
 }

@@ -24,9 +24,9 @@ import (
 	// pprof http tool
 	_ "net/http/pprof"
 
-	"github.com/robfig/cron/v3"
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
+	"github.com/robfig/cron/v3"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
 	"k8s.io/apimachinery/pkg/runtime"
@@ -67,6 +67,7 @@ func main() {
 			"Enabling this will ensure there is only one active controller manager.")
 	//pprof http api option
 	flag.BoolVar(&enablePProf, "enable-pprof", false, "Enable pprof http endpoint.")
+
 	opts := zap.Options{
 		Development: true,
 	}
@@ -99,7 +100,6 @@ func main() {
 
 	if err = (&controllers.LinkedSecretReconciler{
 		Client:   mgr.GetClient(),
-		Log:      ctrl.Log.WithName("controllers").WithName("LinkedSecret"),
 		Scheme:   mgr.GetScheme(),
 		Recorder: mgr.GetEventRecorderFor("linkedsecret-controller"),
 		Cronjob:  make(map[types.UID]*cron.Cron),
@@ -123,4 +123,5 @@ func main() {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}
+
 }

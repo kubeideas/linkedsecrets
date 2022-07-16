@@ -1,21 +1,23 @@
 package controllers
 
 import (
+	"context"
 	"encoding/base64"
 	"fmt"
 	securityv1 "kubeideas/linkedsecrets/api/v1"
 	"os"
 
-	"github.com/IBM/go-sdk-core/v5/core"
+	"github.com/IBM/go-sdk-core/core"
 	sm "github.com/IBM/secrets-manager-go-sdk/secretsmanagerv1"
 	"github.com/go-openapi/strfmt"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 // Credentials will be provided by environment variables:
 
-func (r *LinkedSecretReconciler) GetIBMSecret(linkedsecret *securityv1.LinkedSecret) ([]byte, error) {
+func (r *LinkedSecretReconciler) GetIBMSecret(ctx context.Context, linkedsecret *securityv1.LinkedSecret) ([]byte, error) {
 
-	log := r.Log.WithValues("linkedsecret", fmt.Sprintf("%s/%s", linkedsecret.Namespace, linkedsecret.Name))
+	log := log.FromContext(ctx)
 
 	// check required provider options
 

@@ -8,12 +8,13 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 // Check if current secret data is different from Cloud secret data
 func (r *LinkedSecretReconciler) checkDiff(ctx context.Context, linkedsecret *securityv1.LinkedSecret, newSecret corev1.Secret) bool {
 
-	log := r.Log.WithValues("linkedsecret", fmt.Sprintf("%s/%s", linkedsecret.Namespace, linkedsecret.Name))
+	log := log.FromContext(ctx)
 
 	//Get current secret
 	var currSecret corev1.Secret

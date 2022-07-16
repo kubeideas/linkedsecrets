@@ -1,17 +1,18 @@
 package controllers
 
 import (
-	"fmt"
+	"context"
 	securityv1 "kubeideas/linkedsecrets/api/v1"
 
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 
-//GetProviderSecret access provider and return filled secret object
-func (r *LinkedSecretReconciler) GetProviderSecret(linkedsecret *securityv1.LinkedSecret) (corev1.Secret, error) {
+//GetCloudSecret get Cloud Secret data
+func (r *LinkedSecretReconciler) GetCloudSecret(ctx context.Context, linkedsecret *securityv1.LinkedSecret) (corev1.Secret, error) {
 
-	log := r.Log.WithValues("linkedsecret", fmt.Sprintf("%s/%s", linkedsecret.Namespace, linkedsecret.Name))
+	log := log.FromContext(ctx)
 
 	// Default secret type
 	var secretType corev1.SecretType = "Opaque"
@@ -24,13 +25,13 @@ func (r *LinkedSecretReconciler) GetProviderSecret(linkedsecret *securityv1.Link
 	//retrieve Cloud secret data
 	switch linkedsecret.Spec.Provider {
 	case GOOGLE:
-		data, err = r.GetGCPSecret(linkedsecret)
+		data, err = r.GetGCPSecret(ctx, linkedsecret)
 	case AWS:
-		data, err = r.GetAWSSecret(linkedsecret)
+		data, err = r.GetAWSSecret(ctx, linkedsecret)
 	case AZURE:
-		data, err = r.GetAzureSecret(linkedsecret)
+		data, err = r.GetAzureSecret(ctx, linkedsecret)
 	case IBM:
-		data, err = r.GetIBMSecret(linkedsecret)
+		data, err = r.GetIBMSecret(ctx, linkedsecret)
 	}
 
 	//return error retrieving Cloud secret data
@@ -38,8 +39,8 @@ func (r *LinkedSecretReconciler) GetProviderSecret(linkedsecret *securityv1.Link
 		return corev1.Secret{}, err
 	}
 
-	// create key/value map based on choosen format
-	if linkedsecret.Spec.ProviderDataFormat == JSONFORMAT {
+	// create key/value map based on data format
+	if linkedsecret.Spec.ProviderSecretFormat == JSONFORMAT {
 		secretMap, err = parseJSON(data)
 	} else {
 		secretMap, err = parsePlainData(data)

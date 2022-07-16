@@ -41,15 +41,15 @@ kind: LinkedSecret
 metadata:
   name: <LINKEDSECRET-NAME>
 spec:
-  deployment: <DEPLOYMENT-NAME>
+  rolloutRestartDeploy: <DEPLOYMENT-NAME>
   keepSecretOnDelete: <true | false>
   provider: Google
-  providerDataFormat: <JSON | PLAIN>
+  providerSecretFormat: <JSON | PLAIN>
   providerOptions:
     project: <GCP-PROJECT-ID>
     secret: <GCP-SECRET-NAME>
     version: <latest | "1" | "2" | ...>  
-  secretName: <SECRET-NAME-CREATED-AND-MAINTAINED-BY-LINKEDSECRETS-ON-KUBERNETES>
+  secretName: <KUBERNETES-SECRET-NAME-CREATED-AND-MAINTAINED-BY-LINKEDSECRETS>
   schedule: <"@every 10m" | ANY-OTHER-SYNCHRONIZATION-INTERVAL>
   suspended: <true | false>
 ```
