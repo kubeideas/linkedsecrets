@@ -6,7 +6,7 @@ Linkedsecrets support `"PLAIN"` format and `"JSON"` format.
 
 ### PLAIN format
 
-This format must use "=" to separate key/value. White spaces and white lines are allowed and will be skipped during payload parse. AWS console stores secrets data only in the **JSON** format and  you will have to use AWS CLI to store secret as binary to use **PLAIN** format.
+This format must use "=" to separate key/value. White spaces and white lines are allowed and will be skipped during payload parse. AWS console stores secrets data only in the **JSON** format and you will have to use AWS CLI to store secret as binary to use **PLAIN** format.
 
 Example:
 
