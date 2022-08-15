@@ -74,7 +74,10 @@ spec:
 
 ## Examples
 
-Click [Here](https://kubeideas.github.io/linkedsecrets/aws/examples/linkedsecret_json_example1.yaml) and get them.
+Click [linkedsecret_json_example1](https://kubeideas.github.io/linkedsecrets/aws/examples/linkedsecret_json_example1.yaml).
+Click [linkedsecret_json_example2](https://kubeideas.github.io/linkedsecrets/aws/examples/linkedsecret_json_example2.yaml).
+Click [linkedsecret_plain_example1](https://kubeideas.github.io/linkedsecrets/aws/examples/linkedsecret_plain_example1.yaml).
+Click [linkedsecret_rollout_restart_deploy](https://kubeideas.github.io/linkedsecrets/aws/examples/linkedsecret_rollout_restart_deploy.yaml).
 
 ## References
 
