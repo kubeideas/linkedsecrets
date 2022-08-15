@@ -97,7 +97,13 @@ spec:
 
 ## Examples
 
-Click [Here](https://kubeideas.github.io/linkedsecrets/examples.zip) and get them.
+Click [linkedsecret_json_example1.yaml](https://kubeideas.github.io/linkedsecrets/azure/examples/linkedsecret_json_example1.yaml).
+
+Click [linkedsecret_json_example2.yaml](https://kubeideas.github.io/linkedsecrets/azure/examples/linkedsecret_json_example2.yaml).
+
+Click [linkedsecret_plain_example1.yaml](https://kubeideas.github.io/linkedsecrets/azure/examples/linkedsecret_plain_example1.yaml).
+
+Click [linkedsecret_rollout_restart_deploy.yaml](https://kubeideas.github.io/linkedsecrets/azure/examples/linkedsecret_rollout_restart_deploy.yaml).
 
 ## References
 
