@@ -74,7 +74,7 @@ spec:
 
 ## Examples
 
-Click [Here](https://kubeideas.github.io/linkedsecrets/aws/examples/linkedsecret_json_example1.yaml) and get them.
+Click [Here](https://kubeideas.github.io/linkedsecrets/examples.zip) and get them.
 
 ## References
 
