@@ -13,7 +13,7 @@ This document describes how to install and remove Linkedsecrets CRD and helm cha
 Before install Linkedsecrets Helm chart, install manually Linkedsecrets CRD:
 
 ``` bash
-kubectl apply -f https://github.com/kubeideas/linkedsecrets/releases/download/v0.8.3/security.kubeideas.io_linkedsecrets.yaml
+kubectl apply -f https://github.com/kubeideas/linkedsecrets/releases/download/v0.8.4/security.kubeideas.io_linkedsecrets.yaml
 ```
 
 ## Enable GCP Secret Manager Access
