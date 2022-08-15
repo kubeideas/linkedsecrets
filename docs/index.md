@@ -51,7 +51,7 @@ helm search repo kubeideas
 Before install Linkedsecrets Helm chart, install manually Linkedsecrets CRD:
 
 ``` bash
-kubectl apply -f https://github.com/kubeideas/linkedsecrets/releases/download/v0.8.3/security.kubeideas.io_linkedsecrets.yaml
+kubectl apply -f https://github.com/kubeideas/linkedsecrets/releases/download/v0.8.4/security.kubeideas.io_linkedsecrets.yaml
 ```
 
 ## Enable GCP Secret Manager Access
@@ -253,7 +253,7 @@ helm -n <LINKEDSECRETS-NAMESPACE> delete linkedsecrets
 ### **Remove Custom Resource Definitions**
 
 ``` bash
-kubectl delete -f https://github.com/kubeideas/linkedsecrets/releases/download/v0.8.3/security.kubeideas.io_linkedsecrets.yaml
+kubectl delete -f https://github.com/kubeideas/linkedsecrets/releases/download/v0.8.4/security.kubeideas.io_linkedsecrets.yaml
 ```
 
 ### **Remove Linkedsecrets namespace**

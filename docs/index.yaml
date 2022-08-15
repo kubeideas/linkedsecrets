@@ -2,13 +2,13 @@ apiVersion: v1
 entries:
   linkedsecrets:
   - apiVersion: v2
-    appVersion: v0.8.3
-    created: "2022-08-15T09:07:16.901862962-03:00"
+    appVersion: v0.8.4
+    created: "2022-08-15T09:45:46.575193012-03:00"
     description: Linkedsecrets Helm chart for Kubernetes
-    digest: de80166c12f7542c2aae43c84f262770e324def23236c18f3fcdab85fb5bea5a
+    digest: d47437401dfdaa819b1c1e74fb271b07db4c0285dc7e443a606dbd1f3529e7c0
     name: linkedsecrets
     type: application
     urls:
     - https://kubeideas.github.io/linkedsecrets/charts/linkedsecrets-1.0.0.tgz
     version: 1.0.0
-generated: "2022-08-15T09:07:16.900988668-03:00"
+generated: "2022-08-15T09:45:46.574481349-03:00"
